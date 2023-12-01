@@ -1,11 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Door</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <style>
+        #flexSwitchCheckChecked:checked {
+            background-color: rgb(52, 224, 161);
+            color: white; /* Change text color if needed */
+        }
+        
+    </style>
 </head>
+
 <body>
+
+    <!doctype html>
+    <html lang="en">
+
+    <head>
+        <title>Title</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS v5.2.1 -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+    </head>
+    <header>
+        <!-- place navbar here -->
+        <nav class="navbar navbar-expand-sm navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><span class="fs-2 text-primary fw-bold">Welcome, ABC</span></a>
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="btn-group dropstart">
+                    <img src="/src/img/avt.jpg" alt="avatar" 
+                        class="dropdown-toggle object-fit-contain" 
+                            data-bs-toggle="dropdown" aria-expanded="false"
+                                style="margin-left: auto; margin-right: 1em; width: 4em; border-radius: 50%; border: 3px solid rgb(52,224,161)">
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    </header>
+    <main>
+        <div class="container-fluid h-100">
+            <div class="bg-danger container-fluid border rounded-4 my-3 w-50 h-25" style="padding-top: 1em">
+                <div>
+                    <p class="text-light text-center w-100 fw-bold" style="font-size: 1.5em;">Notification: Stranger Alert!!</p>
+                </div>
+            </div>
+
+            <div class="container-fluid text-center w-50 my-3 ">
+                <img id="streamedImage" src="" alt="Loading..">
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 5rem;" >
+
+                <div class="bg-warning text-center rounded-circle mx-2 mt-1 p-2" style="width: 3.5em; height: 3em;">
+                    <img src="/src/img/warning.svg" alt="warning">
+                </div>
+
+                <div class="w-75 mx-2">
+                    <p class="text-light w-100 m-0 fw-bold" style="font-size: 1.5em;">Trigger Warning</p>
+                </div>
+
+                <button class="bg-warning w-25 rounded-4" style="height: 2em">
+                    <span class="text-dark fw-bold">
+                        Warn
+                    </span>
+                </button>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 5rem; background-color: rgb(52,224,161)" >
+
+                <div class="bg-dark text-center rounded-circle mx-2 mt-1 p-2" style="width: 3.5em; height: 3em;">
+                    <img src="/src/img/Info.svg" alt="info">
+                </div>
+
+                <div class="w-75 mx-2">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.5em;">Sensor Stats</p>
+                </div>
+
+                <button class="bg-dark w-25 rounded-4" style="height: 2em">
+                    <span class="fw-bold" style="color: rgb(52,224,161);">
+                        Detail
+                    </span>
+                </button>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 5rem; background-color: rgb(52,224,161)" >
+
+                <div class="bg-dark text-center rounded-circle mx-2 mt-1 p-2" style="width: 3.5em; height: 3em;">
+                    <img src="/src/img/Access.svg" alt="access">
+                </div>
+
+                <div class="w-75 mx-2">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.5em;">Access History</p>
+                </div>
+
+                <button class="bg-dark w-25 rounded-4" style="height: 2em">
+                    <span class="fw-bold" style="color: rgb(52,224,161);">
+                        Detail
+                    </span>
+                </button>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 5rem; background-color: rgb(247,247,247)" >
+
+                <div class="bg-light text-center rounded-circle mx-2 mt-1 p-2" style="width: 3.5em; height: 3em;">
+                    <img src="/src/img/Door Open.svg" alt="door status" id="ic_door">
+                </div>
+
+                <div class="w-75 mx-2">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.5em;" id="door_status">Door Open</p>
+                </div>
+
+                <div class="form-check form-switch w-25 h-25 d-flex justify-content-center">
+                    <input class="form-check-input w-75 h-100"  type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                </div>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 5rem; background-color: rgb(247,247,247)" >
+
+                <div class="bg-light text-center rounded-circle mx-2 mt-1 p-2" style="width: 3.5em; height: 3em;">
+                    <img src="/src/img/Door Open.svg" alt="door status" id="ic_door">
+                </div>
+
+                <div class="w-75 mx-2">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.5em;" id="cam_status">Manual</p>
+                </div>
+
+                <div class="form-check form-switch w-25 h-25 d-flex justify-content-center">
+                    <input class="form-check-input w-75 h-100"  type="checkbox" role="switch" id="switchCheckedManual" checked>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <footer>
+        <!-- place footer here -->
+    </footer>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+        </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+        integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+        </script>
+
+    <script>
+        var door_switch = document.getElementById("flexSwitchCheckChecked");
+    
+        door_switch.addEventListener('change', function () {
+            if (this.checked) {
+                document.getElementById("door_status").innerHTML = "Door Open";
+                document.getElementById("ic_door").src = "/src/img/Door Open.svg";
+            } else {
+                console.log("Door Close");
+                document.getElementById("door_status").innerHTML = "Door Close";
+                document.getElementById("ic_door").src = "/src/img/Door Close.svg";
+            }
+        })
+
+        var door_switch = document.getElementById("switchCheckedManual");
+    
+        door_switch.addEventListener('change', function () {
+            if (this.checked) {
+                document.getElementById("cam_status").innerHTML = "Manual";
+                //document.getElementById("ic_door").src = "/src/img/Door Open.svg";
+            } else {
+                console.log("Door Close");
+                document.getElementById("cam_status").innerHTML = "Automatic";
+                //document.getElementById("ic_door").src = "/src/img/Door Close.svg";
+            }
+        })
+        document.addEventListener('DOMContentLoaded', function () {
+            const streamedImage = document.getElementById('streamedImage');
+            const imageUrl = 'http://192.168.1.16/capture'; // Replace with your actual URL
+
+            function fetchAndDisplayImage() {
+                // Fetch the image from the URL
+                fetch(imageUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // Create a data URL from the blob
+                        const imageUrl = URL.createObjectURL(blob);
+                        // Update the image source
+                        streamedImage.src = imageUrl;
+                    })
+                    .catch(error => console.error('Error fetching image:', error));
+            }
+
+            // Set an interval to fetch and display images every 1000 milliseconds (1 second)
+            setInterval(fetchAndDisplayImage, 300);
+        });
+    </script>
+
     
 </body>
+
 </html>

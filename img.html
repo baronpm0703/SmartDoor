@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Streaming</title>
+</head>
+
+<body>
+    <img id="streamedImage" src="" alt="Streamed Image">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const streamedImage = document.getElementById('streamedImage');
+            const imageUrl = 'http://192.168.1.16/capture'; // Replace with your actual URL
+
+            function fetchAndDisplayImage() {
+                // Fetch the image from the URL
+                fetch(imageUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // Create a data URL from the blob
+                        const imageUrl = URL.createObjectURL(blob);
+                        // Update the image source
+                        streamedImage.src = imageUrl;
+                    })
+                    .catch(error => console.error('Error fetching image:', error));
+            }
+
+            // Set an interval to fetch and display images every 1000 milliseconds (1 second)
+            setInterval(fetchAndDisplayImage, 300);
+        });
+    </script>
+</body>
+
+</html>

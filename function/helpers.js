@@ -1,5 +1,6 @@
 function isTrue(value) {
-  return value === true;
+  if (value == true) return true;
+  return false;
 }   
 
 module.exports = {

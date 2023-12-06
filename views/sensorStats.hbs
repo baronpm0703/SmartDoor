@@ -6,28 +6,35 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">Index</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Name</th>
+                        <th scope="col">PIR</th>
+                        <th scope="col">Ultrasonic</th>
                         <!-- Add more columns as needed -->
                     </tr>
                 </thead>
                 <tbody>
-                    {{#each sensorData}}
+                    
                         <tr>
-                            <th scope="row">{{@index}}</th>
                             <td scope="col">
-                                {{#if (isTrue stranger)}} 
-                                    Stranger
+                                {{#if (isTrue sensorData.PIR)}} 
+                                    Có Chuyển Động
                                     {{else}}
-                                    Family
+                                    Không Có Chuyển Động
                                 {{/if}}
                                 
                             </td>
-                            <td scope="col">{{name}}</td>
+                            <td scope="col">{{sensorData.Ultrasonic}} cm</td>
                         </tr>
-                    {{/each}}
+                    
                 </tbody>
             </table>
         </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        setInterval(() => {
+            location.reload();
+        }, 3000);
+    });
+</script>

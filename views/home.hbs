@@ -34,7 +34,7 @@
             </div>
 
             <div class="container-fluid text-center w-50 my-3 ">
-                <img id="streamedImage" src="" alt="Loading..">
+                <img id="streamedImage" src="http://172.29.192.20/cam-mid.jpg" alt="Loading..">
             </div>
 
             <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 4rem;" >
@@ -47,7 +47,7 @@
                     <p class="text-light w-100 m-0 fw-bold" style="font-size: 1.2em;">Trigger Warning</p>
                 </div>
 
-                <button class="bg-warning w-25 rounded-4" style="line-height: 1em; font-size: 1em; width: 4em;">
+                <button class="bg-warning w-25 rounded-4 warn-btn" style="line-height: 1em; font-size: 1em; width: 4em;">
                     <span class="text-dark fw-bold" style="font-size: 0.7em;">
                         Warn
                     </span>
@@ -64,7 +64,7 @@
                     <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;">Sensor Stats</p>
                 </div>
 
-               <a href="/home/sensorStats" class="bg-dark w-25 rounded-4 d-flex justify-content-center" style="line-height: 1.5em; font-size: 1em; width: 4em; text-decoration: none;">
+            <a href="/home/sensorStats" class="bg-dark w-25 rounded-4 d-flex justify-content-center" style="line-height: 1.5em; font-size: 1em; width: 4em; text-decoration: none;">
                     <span class="fw-bold" style="color: rgb(52,224,161); font-size: 0.7em;">
                         Detail
                     </span>
@@ -106,11 +106,11 @@
             <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
 
                 <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
-                    <img src="/img/Door Open.svg" alt="door status" id="ic_door" class="w-100">
+                    <img src="/img/auto.svg" alt="door status" id="workMethod" class="w-100">
                 </div>
 
                 <div class="w-75 ms-2 me-3">
-                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="cam_status">Manual</p>
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="cam_status">Automatic</p>
                 </div>
 
                 <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;">
@@ -121,55 +121,113 @@
         </div>
     </main>
 
+
 <script>
+        // Door Status
         var door_switch = document.getElementById("flexSwitchCheckChecked");
     
-        door_switch.addEventListener('change', function () {
+        door_switch.addEventListener('change', async function () {
             if (this.checked) {
-                document.getElementById("door_status").innerHTML = "Door Open";
-                document.getElementById("ic_door").src = "/img/Door Open.svg";
-            } else {
-                console.log("Door Close");
+
+                var DoorStatus = {
+                    status: true
+                }
+                var Close = await fetch('/home/door', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(DoorStatus)
+                });
+
                 document.getElementById("door_status").innerHTML = "Door Close";
                 document.getElementById("ic_door").src = "/img/Door Close.svg";
-            }
-        })
-
-        var door_switch = document.getElementById("switchCheckedManual");
-    
-        door_switch.addEventListener('change', function () {
-            if (this.checked) {
-                document.getElementById("cam_status").innerHTML = "Manual";
-                //document.getElementById("ic_door").src = "/img/Door Open.svg";
             } else {
-                console.log("Door Close");
-                document.getElementById("cam_status").innerHTML = "Automatic";
-                //document.getElementById("ic_door").src = "/img/Door Close.svg";
+                
+                var DoorStatus = {
+                    status: false
+                }
+                var Open = await fetch('/home/door', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(DoorStatus)
+                });
+
+                document.getElementById("door_status").innerHTML = "Door Open";
+                document.getElementById("ic_door").src = "/img/Door Open.svg";
             }
         })
-        document.addEventListener('DOMContentLoaded', function () {
-            const streamedImage = document.getElementById('streamedImage');
-            const imageUrl = 'http://192.168.1.16/capture'; // Replace with your actual URL
 
-            function fetchAndDisplayImage() {
-                // Fetch the image from the URL
-                fetch(imageUrl)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        // Create a data URL from the blob
-                        const imageUrl = URL.createObjectURL(blob);
-                        // Update the image source
-                        streamedImage.src = imageUrl;
-                    })
-                    .catch(error => console.error('Error fetching image:', error));
+        // Method
+        var method_switch = document.getElementById("switchCheckedManual");
+    
+        method_switch.addEventListener('change', async function () {
+            if (this.checked) {
+                var workMethod = {
+                    isAuto: true
+                }
+                var Automatic = await fetch('/home/method', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(workMethod)
+                });
+
+                document.getElementById("cam_status").innerHTML = "Automatic";
+                document.getElementById("workMethod").src = "/img/auto.svg";
+                
+            } else {
+                var workMethod = {
+                    isAuto: false
+                }
+                var Manual = await fetch('/home/method', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(workMethod)
+                });
+
+                document.getElementById("cam_status").innerHTML = "Manual";
+                document.getElementById("workMethod").src = "/img/manual.svg";
+                
             }
+        })
 
-            // Set an interval to fetch and display images every 1000 milliseconds (1 second)
-            setInterval(fetchAndDisplayImage, 300);
+        // JavaScript code to periodically update the image
+        function updateImage() {
+            const imageUrl = 'http://172.29.192.20/cam-mid.jpg';
+            const imgElement = document.getElementById('streamedImage');
+            
+            // Update the image source
+            imgElement.src = imageUrl + '?timestamp=' + new Date().getTime();
+            
+            // Set a timeout to update the image every 1000 milliseconds (1 second)
+            setTimeout(updateImage, 500);
+        }
+
+        // Call the updateImage function to start streaming the image
+        //updateImage();
+
+
+        var warn_btn = document.querySelector('.warn-btn');
+        var warn = {
+            warn: true
+        }
+        warn_btn.addEventListener('click', async function () {
+            var Warn = await fetch('/home/warn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(warn)
+            });
+
+            
         });
+
+
 </script>

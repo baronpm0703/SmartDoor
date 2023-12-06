@@ -7,7 +7,10 @@ require('firebase/compat/database');
 require('firebase/compat/storage');
 
 let {Sensor} = require("./src/data");
-let SensorData = "";
+var AccessHistoryData = [];
+var SensorData = {};
+
+
 const helpers = {
     checkTrue: require("./function/helpers")
 };
@@ -31,8 +34,13 @@ const storage = firebase.storage();
 const database = firebase.database();
 const app = express();
 
-const usersRef = database.ref('Data');
 
+// Body parser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const usersAccessHistoryRef = database.ref('Data');
+const userSensorRef = database.ref('Sensor');
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -98,10 +106,11 @@ app.get('/download/:fileName', async (req, res) => {
     }
 });
 
-usersRef.once('value', async (snapshot) => {
-    // Handle the snapshot of data
-    data = await snapshot.val();
 
+
+userSensorRef.once('value', async (snapshot) => {
+    // Handle the snapshot of data
+    SensorData = await snapshot.val();
     // Update your UI or perform any other actions with the retrieved data
     }, (error) => {
             // Handle the error
@@ -109,9 +118,36 @@ usersRef.once('value', async (snapshot) => {
 });
 
 app.get('/home/sensorStats', (req, res) => {
+    userSensorRef.on('value', async (snapshot) => {
+        // Handle the snapshot of data
+        SensorData = await snapshot.val();
+        // Update your UI or perform any other actions with the retrieved data
+        }, (error) => {
+                // Handle the error
+        console.log(error);
+    });
+    res.render('sensorStats',{sensorData: SensorData, pageTitle: "Sensor Stats"});
+});
 
-    res.render('sensorStats',{sensorData: data, pageTitle: "Sensor Stats"});
-    
+usersAccessHistoryRef.once('value', async (snapshot) => {
+    // Handle the snapshot of data
+    AccessHistoryData = await snapshot.val();
+    // Update your UI or perform any other actions with the retrieved data
+    }, (error) => {
+            // Handle the error
+    console.log(error);
+});
+
+app.get('/home/accessHistory', (req, res) => {
+    usersAccessHistoryRef.on('value', async (snapshot) => {
+        // Handle the snapshot of data
+        AccessHistoryData = await snapshot.val();
+        // Update your UI or perform any other actions with the retrieved data
+        }, (error) => {
+                // Handle the error
+        console.log(error);
+    });
+    res.render('accessHistory',{accessHistory: AccessHistoryData, pageTitle: "Access History"});
 });
 
 // Post
@@ -156,6 +192,38 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     res.send('File uploaded successfully!');
 });
+
+app.post('/home/warn', async (req, res) => {
+    const { warn } = req.body;
+    const warnData = {
+        warn: warn
+    }
+    
+    await database.ref('Buzzer').update(warnData);
+    res.send('Warned successfully!');
+});
+
+
+app.post('/home/method', async (req, res) => {
+    const { isAuto } = req.body;
+    const WorkMethodData = {
+        isAuto: isAuto
+    }
+    
+    await database.ref('WorkMethod').update(WorkMethodData);
+    res.send('Change workMethod successfully!');
+});
+
+app.post('/home/door', async (req, res) => {
+    const { status } = req.body;
+    const DoorStatus = {
+        status: status
+    }
+    
+    await database.ref('Door').update(DoorStatus);
+    res.send('Change Door Status successfully!');
+});
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;

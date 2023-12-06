@@ -6,6 +6,13 @@ require('firebase/compat/auth');
 require('firebase/compat/database');
 require('firebase/compat/storage');
 
+let {Sensor} = require("./src/data");
+let SensorData = "";
+const helpers = {
+    checkTrue: require("./function/helpers")
+};
+
+
 const multer = require('multer');
 
 const firebaseConfig = {
@@ -21,34 +28,100 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const storage = firebase.storage();
+const database = firebase.database();
 const app = express();
+
+const usersRef = database.ref('Data');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Handlebars setup
+app.use(express.static(__dirname + "/src"));
 app.engine("hbs", expressHbs.engine({
     layoutsDir: __dirname + "/views/layouts",
     partialsDir: __dirname + "/views/partials",
     extname: "hbs",
     defaultLayout: "layout",
+    helpers: {
+        isTrue: helpers.checkTrue.isTrue
+    }
 })
 );
 
 app.set("view engine", "hbs");
 
+
+// Multer setup
+const upload = multer();
+
 // Routes
 app.get('/', (req, res) => {
-    res.render('login', { storage: storage });
+    res.redirect('/loginPage');
 });
 
+app.get('/loginPage', (req, res) => {
+    res.render('login');
+});
+
+app.get('/registerPage', (req, res) => {
+    res.render('register');
+});
+
+app.get('/home', (req, res) => {
+    res.render('home');
+});
+
+app.get('/upload', (req, res) => {
+    res.render('upload');
+});
+
+
+app.get('/download', async (req, res) => {
+    const storageRef = storage.ref();
+    const files = await storageRef.listAll();
+
+    res.render('download', { files: files.items.map(item => item.name) });
+});
+
+app.get('/download/:fileName', async (req, res) => {
+    const { fileName } = req.params;
+
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(fileName);
+
+    try {
+        const downloadURL = await fileRef.getDownloadURL();
+        res.redirect(downloadURL);
+    } catch (error) {
+        res.status(404).send('File not found');
+    }
+});
+
+usersRef.once('value', async (snapshot) => {
+    // Handle the snapshot of data
+    data = await snapshot.val();
+
+    // Update your UI or perform any other actions with the retrieved data
+    }, (error) => {
+            // Handle the error
+    console.log(error);
+});
+
+app.get('/home/sensorStats', (req, res) => {
+
+    res.render('sensorStats',{sensorData: data, pageTitle: "Sensor Stats"});
+    
+});
+
+// Post
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     auth.signInWithEmailAndPassword(email, password)
         .then(() => {
             // Successfully logged in
-            res.send('Logged in successfully!');
+            res.redirect('/home');
         })
         .catch((error) => {
             // Handle login error
@@ -70,18 +143,6 @@ app.post('/register', (req, res) => {
         });
 });
 
-// Multer setup
-const upload = multer();
-
-// Routes
-app.get('/', (req, res) => {
-    res.render('login');
-});
-
-app.get('/upload', (req, res) => {
-    res.render('upload');
-});
-
 app.post('/upload', upload.single('file'), async (req, res) => {
     const { file } = req;
 
@@ -94,27 +155,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     await fileRef.put(file.buffer);
 
     res.send('File uploaded successfully!');
-});
-
-app.get('/download', async (req, res) => {
-    const storageRef = storage.ref();
-    const files = await storageRef.listAll();
-
-    res.render('download', { files: files.items.map(item => item.name) });
-});
-
-app.get('/download/:fileName', async (req, res) => {
-    const { fileName } = req.params;
-
-    const storageRef = storage.ref();
-    const fileRef = storageRef.child(fileName);
-
-    try {
-        const downloadURL = await fileRef.getDownloadURL();
-        res.redirect(downloadURL);
-    } catch (error) {
-        res.status(404).send('File not found');
-    }
 });
 
 // Start the server

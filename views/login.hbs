@@ -1,36 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
+<div class="container my-4">
+    <div class="container d-flex flex-row my-3">
+        <img src="/img/logo.svg" alt="logo" class="pt-1">
+        <span class="text-dark mx-1" style="font-weight: 500; font-size: 2.3em;">Smart Door</span>
+    </div>
+    <div class="container d-flex flex-column mb-2">
+        <span class="fs-2 text-dark fw-medium">SIGN IN</span>
+        <form action="/login" method="post" class="w-100 px-1">
+            <div class="my-2">
+                <input type="email" id="email" name="email" placeholder="Account" 
+                    class="form-control"  
+                        style="line-height: 2em; background-color: lightgray; font-weight: 500;" required><br>
+            </div>
+            
+            <div class="my-2">
+            <input type="password" id="password" name="password" placeholder="Password"   
+                    class="form-control"  
+                        style="line-height: 2em; background-color: lightgray; font-weight: 500;" required><br>
+            </div>
 
-<body>
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
+            <button type="submit" class="w-100 border border-0 rounded-3" style="line-height: 3em; background-color: rgb(52,224,161); font-weight: 500;">LOGIN</button>
+        </form>
+    </div>
+    <div class="container px-3 d-flex flex-row justify-content-center mb-2">
+        <div style="height: 1px; background-color: lightgray; width: 40%; margin: 0.8em 0;"></div>
+        <span class=".text-light-emphasis mx-1" style="font-weight: 400; font-size: 1em;">OR</span>
+        <div style="height: 1px; background-color: lightgray; width: 40%; margin: 0.8em 0;"></div>
+    </div>
+    <div class="container">
+        <a href="/registerPage" type="button" class="w-100 border border-0 rounded-3 text-center" style="line-height: 3em; background-color: black; color: rgb(52,224,161); font-weight: 500; text-decoration: none;">REGISTER</a>
+    </div>
+</div>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
 
-        <button type="submit">Login</button>
-    </form>
+{{!-- <h1>Register</h1>
+<form action="/register" method="post">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required><br>
 
-    <h1>Register</h1>
-    <form action="/register" method="post">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required><br>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-
-        <button type="submit">Register</button>
-    </form>
-
-</body>
-
-</html>
+    <button type="submit">Register</button>
+</form> --}}

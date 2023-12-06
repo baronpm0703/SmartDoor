@@ -1,0 +1,33 @@
+
+
+<div class="container mt-5">
+        <h1>{{pageTitle}}</h1>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Index</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Name</th>
+                        <!-- Add more columns as needed -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each sensorData}}
+                        <tr>
+                            <th scope="row">{{@index}}</th>
+                            <td scope="col">
+                                {{#if (isTrue stranger)}} 
+                                    Stranger
+                                    {{else}}
+                                    Family
+                                {{/if}}
+                                
+                            </td>
+                            <td scope="col">{{name}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+</div>

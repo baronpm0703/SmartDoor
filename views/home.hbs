@@ -1,0 +1,175 @@
+<style>
+    /* Add hover effect color to dropdown items */
+    .dropdown-item:hover {
+        background-color: rgba(52, 224, 161, 0.5); /* Change the color as per your preference */
+        color: #fff; /* Change the text color as needed */
+    }
+</style>
+<header>
+        <!-- place navbar here -->
+        <nav class="navbar navbar-expand-sm navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><span class="fs-2 text-primary fw-bold">Welcome, ABC</span></a>
+                <div class="btn-group dropstart">
+                    <img src="/img/avt.jpg" alt="avatar" 
+                        class="dropdown-toggle object-fit-contain" 
+                            data-bs-toggle="dropdown" aria-expanded="false"
+                                style="margin-left: auto; margin-right: 1em; width: 4em; border-radius: 50%; border: 3px solid rgb(52,224,161)">
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="#">Personal Info</a></li>
+                        <li><a class="dropdown-item" href="#">Add Face ID</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    </header>
+    <main>
+        <div class="container-fluid h-100">
+            <div class="bg-danger container-fluid border rounded-4 my-3 w-75 h-25" style="padding-top: 1em">
+                <div>
+                    <p class="text-light text-center w-100 fw-bold" style="font-size: 1.2em;">Notification: Stranger Alert!!</p>
+                </div>
+            </div>
+
+            <div class="container-fluid text-center w-50 my-3 ">
+                <img id="streamedImage" src="" alt="Loading..">
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 4rem;" >
+
+                <div class="bg-warning text-center rounded-circle ms-1" style="width: 2em; height: 1.8em;">
+                    <img src="/img/warning.svg" alt="warning" class="w-75 mb-1">
+                </div>
+
+                <div class="w-75 ms-2  me-1">
+                    <p class="text-light w-100 m-0 fw-bold" style="font-size: 1.2em;">Trigger Warning</p>
+                </div>
+
+                <button class="bg-warning w-25 rounded-4" style="line-height: 1em; font-size: 1em; width: 4em;">
+                    <span class="text-dark fw-bold" style="font-size: 0.7em;">
+                        Warn
+                    </span>
+                </button>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(52,224,161)" >
+
+                <div class="bg-dark text-center rounded-circle ms-1" style="width: 2.1em; height: 1.8em;">
+                    <img src="/img/Info.svg" alt="info" class="w-75">
+                </div>
+
+                <div class="w-75 ms-2  me-1" >
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;">Sensor Stats</p>
+                </div>
+
+               <a href="/home/sensorStats" class="bg-dark w-25 rounded-4 d-flex justify-content-center" style="line-height: 1.5em; font-size: 1em; width: 4em; text-decoration: none;">
+                    <span class="fw-bold" style="color: rgb(52,224,161); font-size: 0.7em;">
+                        Detail
+                    </span>
+                </a>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(52,224,161)" >
+
+                <div class="bg-dark text-center rounded-circle ms-1" style="width: 2.2em; height: 1.8em;">
+                    <img src="/img/Access.svg" alt="access" class="w-75">
+                </div>
+
+                <div class="w-75 ms-2 me-1">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;">Access History</p>
+                </div>
+
+                <a href="/home/accessHistory" class="bg-dark w-25 rounded-4 d-flex justify-content-center" style="line-height: 1.5em; font-size: 1em; width: 4em; text-decoration: none;">
+                    <span class="fw-bold" style="color: rgb(52,224,161); font-size: 0.7em;">
+                        Detail
+                    </span>
+                </a>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
+
+                <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
+                    <img src="/img/Door Open.svg" alt="door status" id="ic_door" class="w-100">
+                </div>
+
+                <div class="w-75 ms-2 me-3">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="door_status">Door Open</p>
+                </div>
+
+                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                    <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                </div>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
+
+                <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
+                    <img src="/img/Door Open.svg" alt="door status" id="ic_door" class="w-100">
+                </div>
+
+                <div class="w-75 ms-2 me-3">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="cam_status">Manual</p>
+                </div>
+
+                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;">
+                    <input class="form-check-input w-100 h-75"  type="checkbox" role="switch" id="switchCheckedManual" checked>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+<script>
+        var door_switch = document.getElementById("flexSwitchCheckChecked");
+    
+        door_switch.addEventListener('change', function () {
+            if (this.checked) {
+                document.getElementById("door_status").innerHTML = "Door Open";
+                document.getElementById("ic_door").src = "/img/Door Open.svg";
+            } else {
+                console.log("Door Close");
+                document.getElementById("door_status").innerHTML = "Door Close";
+                document.getElementById("ic_door").src = "/img/Door Close.svg";
+            }
+        })
+
+        var door_switch = document.getElementById("switchCheckedManual");
+    
+        door_switch.addEventListener('change', function () {
+            if (this.checked) {
+                document.getElementById("cam_status").innerHTML = "Manual";
+                //document.getElementById("ic_door").src = "/img/Door Open.svg";
+            } else {
+                console.log("Door Close");
+                document.getElementById("cam_status").innerHTML = "Automatic";
+                //document.getElementById("ic_door").src = "/img/Door Close.svg";
+            }
+        })
+        document.addEventListener('DOMContentLoaded', function () {
+            const streamedImage = document.getElementById('streamedImage');
+            const imageUrl = 'http://192.168.1.16/capture'; // Replace with your actual URL
+
+            function fetchAndDisplayImage() {
+                // Fetch the image from the URL
+                fetch(imageUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // Create a data URL from the blob
+                        const imageUrl = URL.createObjectURL(blob);
+                        // Update the image source
+                        streamedImage.src = imageUrl;
+                    })
+                    .catch(error => console.error('Error fetching image:', error));
+            }
+
+            // Set an interval to fetch and display images every 1000 milliseconds (1 second)
+            setInterval(fetchAndDisplayImage, 300);
+        });
+</script>

@@ -44,6 +44,26 @@
                 </div>
 
                 <div class="w-75 ms-2  me-1">
+                    <p class="text-light w-100 m-0 fw-bold" style="font-size: 1em;">Stranger Alert Time</p>
+                </div>
+
+                <select id="alert-time" name="" class="bg-warning w-25 rounded-4 warn-btn text-dark fw-bold text-center" style="line-height: 1em; font-size: 0.7em; width: 4em; padding-left: 0.5em;">
+                            <option value="{{strangerAlert.time}}">{{convertFromMillis strangerAlert.time}}</option>
+                            <option value="5000">5s</option>
+                            <option value="30000">30s</option>
+                            <option value="60000">1m</option>
+                            <option value="300000">5m</option>
+                            <option value="600000">10m</option>
+                </select>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 4rem;" >
+
+                <div class="bg-warning text-center rounded-circle ms-1" style="width: 2em; height: 1.8em;">
+                    <img src="/img/warning.svg" alt="warning" class="w-75 mb-1">
+                </div>
+
+                <div class="w-75 ms-2  me-1">
                     <p class="text-light w-100 m-0 fw-bold" style="font-size: 1.2em;">Trigger Warning</p>
                 </div>
 
@@ -52,6 +72,25 @@
                         Warn
                     </span>
                 </button>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 4rem;" >
+
+                <div class="bg-warning text-center rounded-circle ms-1" style="width: 2em; height: 1.8em;">
+                    <img src="/img/warning.svg" alt="warning" class="w-75 mb-1">
+                </div>
+
+                <div class="w-75 ms-2  me-1">
+                    <p class="text-light w-100 m-0 fw-bold" style="font-size: 1.2em;">Warning Time</p>
+                </div>
+
+                <select id="warn-time" name="" class="bg-warning w-25 rounded-4 warn-btn text-dark fw-bold text-center" style="line-height: 1em; font-size: 0.7em; width: 4em; padding-left: 0.5em;">
+                            <option value="5000">5s</option>
+                            <option value="30000">30s</option>
+                            <option value="60000">1m</option>
+                            <option value="300000">5m</option>
+                            <option value="600000">10m</option>
+                </select>
             </div>
 
             <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(52,224,161)" >
@@ -91,16 +130,35 @@
             <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
 
                 <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
-                    <img src="/img/Door Open.svg" alt="door status" id="ic_door" class="w-100">
+                    <img src="{{#if (isTrue doorData.status)}}/img/Door Close.svg{{else}}/img/Door Open.svg{{/if}}" alt="door status" id="ic_door" class="w-100">
                 </div>
 
                 <div class="w-75 ms-2 me-3">
-                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="door_status">Door Open</p>
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="door_status">{{#if (isTrue doorData.status)}}Door Close{{else}}Door Open{{/if}}</p>
                 </div>
 
                 <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
-                    <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                    <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="flexSwitchCheckChecked" {{#if (isTrue doorData.status)}}checked{{/if}}>
                 </div>
+            </div>
+
+            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
+
+                <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
+                    <img src="/img/Door Close.svg" alt="door status" class="w-100">
+                </div>
+
+                <div class="w-75 ms-2 me-3">
+                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="door_status">Close Time</p>
+                </div>
+
+                <select id="door-time" name="" class="bg-primary w-25 border-0 rounded-4 warn-btn text-light fw-bold text-center" style="line-height: 1em; font-size: 0.7em; width: 4em; padding-left: 0.5em;">
+                            <option value="5000">5s</option>
+                            <option value="30000">30s</option>
+                            <option value="60000">1m</option>
+                            <option value="300000">5m</option>
+                            <option value="600000">10m</option>
+                </select>
             </div>
 
             <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
@@ -123,9 +181,9 @@
 
 
 <script>
+
         // Door Status
         var door_switch = document.getElementById("flexSwitchCheckChecked");
-    
         door_switch.addEventListener('change', async function () {
             if (this.checked) {
 
@@ -140,13 +198,17 @@
                     body: JSON.stringify(DoorStatus)
                 });
 
+
                 document.getElementById("door_status").innerHTML = "Door Close";
                 document.getElementById("ic_door").src = "/img/Door Close.svg";
             } else {
                 
+                var door_time = document.getElementById('door-time');
                 var DoorStatus = {
-                    status: false
+                    status: false,
+                    time: parseInt(door_time.value)
                 }
+                
                 var Open = await fetch('/home/door', {
                     method: 'POST',
                     headers: {
@@ -155,8 +217,12 @@
                     body: JSON.stringify(DoorStatus)
                 });
 
+                setTimeout(() => {location.reload();}, parseInt(door_time.value))
+
                 document.getElementById("door_status").innerHTML = "Door Open";
                 document.getElementById("ic_door").src = "/img/Door Open.svg";
+
+            
             }
         })
 
@@ -209,13 +275,12 @@
             setTimeout(updateImage, 500);
         }
 
-        // Call the updateImage function to start streaming the image
-        //updateImage();
-
-
+        // Warnning
         var warn_btn = document.querySelector('.warn-btn');
+        var warn_time = document.getElementById('warn-time');
         var warn = {
-            warn: true
+            warn: true,
+            time: parseInt(warn_time.value)
         }
         warn_btn.addEventListener('click', async function () {
             var Warn = await fetch('/home/warn', {
@@ -229,5 +294,19 @@
             
         });
 
-
+        // Stranger Alert
+        var alert_time = document.getElementById('alert-time');
+        
+        alert_time.addEventListener('change', async function() {
+            var alert = {
+                time: parseInt(this.value)
+            }
+            var Alert = await fetch('/home/alert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(alert)
+            });
+        })
 </script>

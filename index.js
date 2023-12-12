@@ -6,9 +6,11 @@ require('firebase/compat/auth');
 require('firebase/compat/database');
 require('firebase/compat/storage');
 
-let {Sensor} = require("./src/data");
 var AccessHistoryData = [];
 var SensorData = {};
+var DoorData = {};
+var StrangerAlert = {}
+var UserData = {}
 
 
 const helpers = {
@@ -41,6 +43,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 const usersAccessHistoryRef = database.ref('Data');
 const userSensorRef = database.ref('Sensor');
+const userDoorRef = database.ref('Door');
+const userStrangerAlertRef = database.ref('StrangerAlert');
+const userConfig = database.ref('UserConfig');
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -52,7 +58,8 @@ app.engine("hbs", expressHbs.engine({
     extname: "hbs",
     defaultLayout: "layout",
     helpers: {
-        isTrue: helpers.checkTrue.isTrue
+        isTrue: helpers.checkTrue.isTrue,
+        convertFromMillis: helpers.checkTrue.convertFromMillis
     }
 })
 );
@@ -76,8 +83,42 @@ app.get('/registerPage', (req, res) => {
     res.render('register');
 });
 
+userDoorRef.once('value', async (snapshot) => {
+    // Handle the snapshot of data
+    DoorData = await snapshot.val();
+    // Update your UI or perform any other actions with the retrieved data
+    }, (error) => {
+            // Handle the error
+    console.log(error);
+});
+
+userStrangerAlertRef.once('value', async (snapshot) => {
+    // Handle the snapshot of data
+    StrangerAlert = await snapshot.val();
+    // Update your UI or perform any other actions with the retrieved data
+    }, (error) => {
+            // Handle the error
+    console.log(error);
+});
+
 app.get('/home', (req, res) => {
-    res.render('home');
+    userDoorRef.on('value', async (snapshot) => {
+        // Handle the snapshot of data
+        DoorData = await snapshot.val();
+        // Update your UI or perform any other actions with the retrieved data
+        }, (error) => {
+                // Handle the error
+        console.log(error);
+    });
+    userStrangerAlertRef.on('value', async (snapshot) => {
+        // Handle the snapshot of data
+        StrangerAlert = await snapshot.val();
+        // Update your UI or perform any other actions with the retrieved data
+        }, (error) => {
+                // Handle the error
+        console.log(error);
+    });
+    res.render('home', {doorData: DoorData, strangerAlert: StrangerAlert});
 });
 
 app.get('/upload', (req, res) => {
@@ -85,28 +126,42 @@ app.get('/upload', (req, res) => {
 });
 
 
-app.get('/download', async (req, res) => {
-    const storageRef = storage.ref();
-    const files = await storageRef.listAll();
-
-    res.render('download', { files: files.items.map(item => item.name) });
-});
-
-app.get('/download/:fileName', async (req, res) => {
-    const { fileName } = req.params;
-
-    const storageRef = storage.ref();
-    const fileRef = storageRef.child(fileName);
+app.get('/home/faceID', async (req, res) => {
+    
+    const storageRef = storage.ref("user_images/");
 
     try {
-        const downloadURL = await fileRef.getDownloadURL();
-        res.redirect(downloadURL);
+        // List all files in the storageRef
+        const files = await storageRef.listAll();
+
+        // Get download URLs for each file
+        const downloadURLs = await Promise.all(files.items.map(async (item) => {
+            const url = await item.getDownloadURL();
+            return { fileName: item.name, url };
+        }));
+
+        console.log(downloadURLs);
+        res.render('download', { paths: downloadURLs });
+
     } catch (error) {
-        res.status(404).send('File not found');
+        console.error('Error fetching files:', error);
+        res.send('Error');
     }
 });
 
+// app.get('/download/:fileName', async (req, res) => {
+//     const { fileName } = req.params;
 
+//     const storageRef = storage.ref();
+//     const fileRef = storageRef.child(fileName);
+
+//     try {
+//         const downloadURL = await fileRef.getDownloadURL();
+//         res.redirect(downloadURL);
+//     } catch (error) {
+//         res.status(404).send('File not found');
+//     }
+// });
 
 userSensorRef.once('value', async (snapshot) => {
     // Handle the snapshot of data
@@ -150,6 +205,29 @@ app.get('/home/accessHistory', (req, res) => {
     res.render('accessHistory',{accessHistory: AccessHistoryData, pageTitle: "Access History"});
 });
 
+userConfig.once('value', async (snapshot) => {
+    // Handle the snapshot of data
+    UserData = await snapshot.val();
+    // Update your UI or perform any other actions with the retrieved data
+    }, (error) => {
+    // Handle the error
+    console.log(error);
+});
+
+app.get('/home/config', (req, res) => {
+    userConfig.on('value', async (snapshot) => {
+        // Handle the snapshot of data
+        UserData = await snapshot.val();
+        // Update your UI or perform any other actions with the retrieved data
+        }, (error) => {
+        // Handle the error
+        console.log(error);
+    });
+
+    res.render('config',{userData: UserData, pageTitle: "Config"});
+});
+
+
 // Post
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -179,28 +257,54 @@ app.post('/register', (req, res) => {
         });
 });
 
-app.post('/upload', upload.single('file'), async (req, res) => {
-    const { file } = req;
+// app.post('/upload', upload.single('file'), async (req, res) => {
+//     const { file } = req;
 
-    if (!file) {
-        return res.status(400).send('No file uploaded');
+//     if (!file) {
+//         return res.status(400).send('No file uploaded');
+//     }
+
+//     const storageRef = storage.ref();
+//     const fileRef = storageRef.child(file.originalname);
+//     await fileRef.put(file.buffer);
+
+//     res.send('File uploaded successfully!');
+// });
+
+app.post('/upload', upload.array('files'), async (req, res) => {
+    const { files } = req;
+
+    if (!files || files.length === 0) {
+        return res.status(400).send('No files uploaded');
     }
 
-    const storageRef = storage.ref();
-    const fileRef = storageRef.child(file.originalname);
-    await fileRef.put(file.buffer);
+    const storageRef = storage.ref("user_images/");
 
-    res.send('File uploaded successfully!');
+    // Use Promise.all to upload multiple files concurrently
+    await Promise.all(files.map(async (file) => {
+        const fileRef = storageRef.child(file.originalname);
+        await fileRef.put(file.buffer);
+    }));
+
+    res.send('Files uploaded successfully!');
 });
 
 app.post('/home/warn', async (req, res) => {
-    const { warn } = req.body;
+    const { warn, time } = req.body;
     const warnData = {
         warn: warn
     }
     
     await database.ref('Buzzer').update(warnData);
     res.send('Warned successfully!');
+
+    setTimeout(async () => {
+        const warnData = {
+            warn: false
+        }
+        await database.ref('Buzzer').update(warnData);
+        
+    }, time);
 });
 
 
@@ -215,13 +319,74 @@ app.post('/home/method', async (req, res) => {
 });
 
 app.post('/home/door', async (req, res) => {
-    const { status } = req.body;
+    const { status, time } = req.body;
     const DoorStatus = {
-        status: status
+        status: status,
     }
     
     await database.ref('Door').update(DoorStatus);
     res.send('Change Door Status successfully!');
+
+    if (status == false) {
+        setTimeout(async () => {
+            const DoorStatus = {
+                status: true
+            }
+            await database.ref('Door').update(DoorStatus);
+            
+        }, time);
+    }
+});
+
+app.post('/home/alert', async (req, res) => {
+    const { time } = req.body;
+    const StrangerAlert = {
+        time: time,
+    }
+    
+    await database.ref('StrangerAlert').update(StrangerAlert);
+    res.send('Change Stranger Alert Time successfully!');
+
+});
+
+// Put
+app.put('/home/config', async (req, res) => {
+    const { 
+        autoClose, 
+        autoOpen,
+        camera,
+        checkingDistance,
+        closingTime,
+        faceRegconition,
+        gestureControl,
+        strangerDetect,
+        strangerWarningTime,
+        visitorTracking,
+        smartDoorSystem,
+        warningNotification
+    } = req.body;
+    const configData = {
+        AutoClose: autoClose ? true : false,
+        AutoOpen: autoOpen ? true : false,
+        Camera: camera ? true : false,
+        CheckingDistance: checkingDistance ? parseInt(checkingDistance) : 0,
+        DoorCloseTime: closingTime ? parseInt(closingTime) : 0,
+        FaceRegconition: faceRegconition ? true : false,
+        GestureControl: gestureControl ? true : false,
+        StrangerDetection: strangerDetect ? true : false,
+        StrangerWarningTime: strangerWarningTime ? true : 0,
+        VisitorTracking: visitorTracking ? true : false,
+        WarningNotification: warningNotification ? true : false,
+        SmartDoorSystem: smartDoorSystem ? true : false
+    }
+    try{
+        await database.ref('UserConfig').update(configData);
+        res.send('Warned successfully!');
+    }catch(error){
+        console.log(error);
+        res.send('Error!');
+    }
+    
 });
 
 

@@ -1,312 +1,319 @@
 <style>
     /* Add hover effect color to dropdown items */
     .dropdown-item:hover {
-        background-color: rgba(52, 224, 161, 0.5); /* Change the color as per your preference */
-        color: #fff; /* Change the text color as needed */
+        background-color: rgba(52, 224, 161, 0.5);
+        /* Change the color as per your preference */
+        color: #fff;
+        /* Change the text color as needed */
     }
 </style>
 <header>
-        <!-- place navbar here -->
-        <nav class="navbar navbar-expand-sm navbar-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#"><span class="fs-2 text-primary fw-bold">Welcome, ABC</span></a>
-                <div class="btn-group dropstart">
-                    <img src="/img/avt.jpg" alt="avatar" 
-                        class="dropdown-toggle object-fit-contain" 
-                            data-bs-toggle="dropdown" aria-expanded="false"
-                                style="margin-left: auto; margin-right: 1em; width: 4em; border-radius: 50%; border: 3px solid rgb(52,224,161)">
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="#">Personal Info</a></li>
-                        <li><a class="dropdown-item" href="#">Add Face ID</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </div>
+    <!-- place navbar here -->
+    <nav class="navbar navbar-expand-sm navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><span class="fs-2 fw-bold">Welcome, {{account.username}}</span></a>
+            <div class="btn-group dropstart">
+                <img src="{{#if account.url}}{{account.url}}{{else}}/img/avt.jpg{{/if}}" alt="avatar"
+                    class="dropdown-toggle object-fit-contain" data-bs-toggle="dropdown" aria-expanded="false"
+                    style="margin-left: auto; margin-right: 1em; width:4em; border-radius: 50%; border: 3px solid rgb(52,224,161)">
+                <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><a class="dropdown-item" href="/home/personalInfo">Personal Info</a></li>
+                    <li><a class="dropdown-item" href="/home/config">User Config</a></li>
+                </ul>
             </div>
-        </nav>
-
-    </header>
-    <main>
-        <div class="container-fluid h-100">
-            <div class="bg-danger container-fluid border rounded-4 my-3 w-75 h-25" style="padding-top: 1em">
-                <div>
-                    <p class="text-light text-center w-100 fw-bold" style="font-size: 1.2em;">Notification: Stranger Alert!!</p>
-                </div>
-            </div>
-
-            <div class="container-fluid text-center w-50 my-3 ">
-                <img id="streamedImage" src="http://172.29.192.20/cam-mid.jpg" alt="Loading..">
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 4rem;" >
-
-                <div class="bg-warning text-center rounded-circle ms-1" style="width: 2em; height: 1.8em;">
-                    <img src="/img/warning.svg" alt="warning" class="w-75 mb-1">
-                </div>
-
-                <div class="w-75 ms-2  me-1">
-                    <p class="text-light w-100 m-0 fw-bold" style="font-size: 1em;">Stranger Alert Time</p>
-                </div>
-
-                <select id="alert-time" name="" class="bg-warning w-25 rounded-4 warn-btn text-dark fw-bold text-center" style="line-height: 1em; font-size: 0.7em; width: 4em; padding-left: 0.5em;">
-                            <option value="{{strangerAlert.time}}">{{convertFromMillis strangerAlert.time}}</option>
-                            <option value="5000">5s</option>
-                            <option value="30000">30s</option>
-                            <option value="60000">1m</option>
-                            <option value="300000">5m</option>
-                            <option value="600000">10m</option>
-                </select>
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 4rem;" >
-
-                <div class="bg-warning text-center rounded-circle ms-1" style="width: 2em; height: 1.8em;">
-                    <img src="/img/warning.svg" alt="warning" class="w-75 mb-1">
-                </div>
-
-                <div class="w-75 ms-2  me-1">
-                    <p class="text-light w-100 m-0 fw-bold" style="font-size: 1.2em;">Trigger Warning</p>
-                </div>
-
-                <button class="bg-warning w-25 rounded-4 warn-btn" style="line-height: 1em; font-size: 1em; width: 4em;">
-                    <span class="text-dark fw-bold" style="font-size: 0.7em;">
-                        Warn
-                    </span>
-                </button>
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3" style="height: 4rem;" >
-
-                <div class="bg-warning text-center rounded-circle ms-1" style="width: 2em; height: 1.8em;">
-                    <img src="/img/warning.svg" alt="warning" class="w-75 mb-1">
-                </div>
-
-                <div class="w-75 ms-2  me-1">
-                    <p class="text-light w-100 m-0 fw-bold" style="font-size: 1.2em;">Warning Time</p>
-                </div>
-
-                <select id="warn-time" name="" class="bg-warning w-25 rounded-4 warn-btn text-dark fw-bold text-center" style="line-height: 1em; font-size: 0.7em; width: 4em; padding-left: 0.5em;">
-                            <option value="5000">5s</option>
-                            <option value="30000">30s</option>
-                            <option value="60000">1m</option>
-                            <option value="300000">5m</option>
-                            <option value="600000">10m</option>
-                </select>
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(52,224,161)" >
-
-                <div class="bg-dark text-center rounded-circle ms-1" style="width: 2.1em; height: 1.8em;">
-                    <img src="/img/Info.svg" alt="info" class="w-75">
-                </div>
-
-                <div class="w-75 ms-2  me-1" >
-                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;">Sensor Stats</p>
-                </div>
-
-            <a href="/home/sensorStats" class="bg-dark w-25 rounded-4 d-flex justify-content-center" style="line-height: 1.5em; font-size: 1em; width: 4em; text-decoration: none;">
-                    <span class="fw-bold" style="color: rgb(52,224,161); font-size: 0.7em;">
-                        Detail
-                    </span>
-                </a>
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(52,224,161)" >
-
-                <div class="bg-dark text-center rounded-circle ms-1" style="width: 2.2em; height: 1.8em;">
-                    <img src="/img/Access.svg" alt="access" class="w-75">
-                </div>
-
-                <div class="w-75 ms-2 me-1">
-                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;">Access History</p>
-                </div>
-
-                <a href="/home/accessHistory" class="bg-dark w-25 rounded-4 d-flex justify-content-center" style="line-height: 1.5em; font-size: 1em; width: 4em; text-decoration: none;">
-                    <span class="fw-bold" style="color: rgb(52,224,161); font-size: 0.7em;">
-                        Detail
-                    </span>
-                </a>
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
-
-                <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
-                    <img src="{{#if (isTrue doorData.status)}}/img/Door Close.svg{{else}}/img/Door Open.svg{{/if}}" alt="door status" id="ic_door" class="w-100">
-                </div>
-
-                <div class="w-75 ms-2 me-3">
-                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="door_status">{{#if (isTrue doorData.status)}}Door Close{{else}}Door Open{{/if}}</p>
-                </div>
-
-                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
-                    <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="flexSwitchCheckChecked" {{#if (isTrue doorData.status)}}checked{{/if}}>
-                </div>
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
-
-                <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
-                    <img src="/img/Door Close.svg" alt="door status" class="w-100">
-                </div>
-
-                <div class="w-75 ms-2 me-3">
-                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="door_status">Close Time</p>
-                </div>
-
-                <select id="door-time" name="" class="bg-primary w-25 border-0 rounded-4 warn-btn text-light fw-bold text-center" style="line-height: 1em; font-size: 0.7em; width: 4em; padding-left: 0.5em;">
-                            <option value="5000">5s</option>
-                            <option value="30000">30s</option>
-                            <option value="60000">1m</option>
-                            <option value="300000">5m</option>
-                            <option value="600000">10m</option>
-                </select>
-            </div>
-
-            <div class="container-fluid w-75 d-flex flex-row align-items-center rounded-4 my-3" style="height: 4rem; background-color: rgb(247,247,247)" >
-
-                <div class="bg-light text-center rounded-circle ms-2" style="width: 2.2em; height: 1.8em;">
-                    <img src="/img/auto.svg" alt="door status" id="workMethod" class="w-100">
-                </div>
-
-                <div class="w-75 ms-2 me-3">
-                    <p class="text-dark w-100 m-0 fw-bold" style="font-size: 1.3em;" id="cam_status">Automatic</p>
-                </div>
-
-                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;">
-                    <input class="form-check-input w-100 h-75"  type="checkbox" role="switch" id="switchCheckedManual" checked>
-                </div>
-            </div>
-
         </div>
-    </main>
+    </nav>
+
+</header>
+<main>
+    <div class="container-fluid h-100">
+        <div class="bg-danger container-fluid border rounded-4 my-3 w-75 h-25 {{#if (isTrue warning.Reality)}}  d-block {{else}} d-none {{/if}}"
+            style="padding-top: 1em">
+            <div>
+                <p id="notificationText" class="text-light text-center w-100 fw-bold">Notification: Stranger Alert!!</p>
+            </div>
+        </div>
+
+        <div class="container-fluid text-center w-50 my-3 ">
+            <img id="streamedImage" src="{{IP}}/cam-mid.jpg" alt="Camera is turned off or Image is Loading..."
+                data-ip="{{IP}}/cam-mid.jpg">
+        </div>
+
+        <div class="container-fluid featureBlock  w-75 d-flex flex-row align-items-center bg-dark rounded-4 my-3 ">
+
+            <div id="warningIc" class="bg-warning text-center rounded-circle  iconBlock ms-1">
+                <img src="/img/warning.svg" alt="warning" class="w-75 mb-1">
+            </div>
+
+            <div class="w-75 ms-2  me-1">
+                <p class="text-light w-100 m-0 fw-bold featureText" >Trigger Warning</p>
+            </div>
+
+            <button class="bg-warning w-25 rounded-4 warn-btn featureBtn">
+                <span class="text-dark fw-bold featureFunctionText">
+                    Warn
+                </span>
+            </button>
+        </div>
+
+        <div class="container-fluid featureBlock  w-75 d-flex flex-row align-items-center rounded-4 my-3"
+            style=" background-color: rgb(52,224,161)">
+
+            <div class="bg-dark text-center rounded-circle IcPad iconBlock ms-1">
+                <img src="/img/Info.svg" alt="info" class="w-75">
+            </div>
+
+            <div class="w-75 ms-2  me-1">
+                <p class="text-dark w-100 m-0 fw-bold featureText">Sensor Stats</p>
+            </div>
+
+            <a href="/home/sensorStats" class="bg-dark w-25 rounded-4 d-flex justify-content-center featureBtn"
+                style=" text-decoration: none;">
+                <span class="fw-bold featureFunctionText" style="color: rgb(52,224,161);">
+                    Detail
+                </span>
+            </a>
+        </div>
+
+        <div class="container-fluid featureBlock w-75 d-flex flex-row align-items-center rounded-4 my-3"
+            style=" background-color: rgb(52,224,161)">
+
+            <div class="bg-dark text-center rounded-circle IcPad iconBlock ms-1">
+                <img src="/img/Access.svg" alt="access" class="w-75">
+            </div>
+
+            <div class="w-75 ms-2 me-1">
+                <p class="text-dark w-100 m-0 fw-bold featureText">Access History</p>
+            </div>
+
+            <a href="/home/accessHistory" class="bg-dark w-25 rounded-4 d-flex justify-content-center featureBtn"
+                style="text-decoration: none;">
+                <span class="fw-bold featureFunctionText" style="color: rgb(52,224,161);">
+                    Detail
+                </span>
+            </a>
+        </div>
+
+        <div class="container-fluid featureBlock w-75 d-flex flex-row align-items-center rounded-4 my-3"
+            style=" background-color: rgb(247,247,247)">
+
+            <div class="bg-light text-center rounded-circle iconBlock ms-2">
+                <img src="{{#if (isTrue doorData.Reality)}}/img/Door Open.svg{{else}}/img/Door Close.svg{{/if}}"
+                    alt="door status" id="ic_door" class="w-100">
+            </div>
+
+            <div class="w-75 ms-2 me-3">
+                <p class="text-dark w-100 m-0 fw-bold featureText" id="door_status">Actual State: {{#if
+                    (isTrue doorData.Reality)}}Door Open{{else}}Door Close{{/if}}</p>
+            </div>
+
+
+            <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;">
+                <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                    {{#if (isTrue doorData.Reality)}}checked{{/if}}>
+            </div>
+        </div>
+
+        <div class="container-fluid featureBlock w-75 d-flex flex-row align-items-center rounded-4 my-3"
+            style=" background-color: rgb(247,247,247)">
+
+            <div class="bg-light text-center rounded-circle iconBlock ms-2">
+                <img src="{{#if (isTrue cameraState)}}/img/camera.svg{{else}}/img/camera-off.svg{{/if}}"
+                    alt="camera status" id="camera_status_ic" class="w-100">
+            </div>
+
+            <div class="w-75 ms-2 me-3">
+                <p class="text-dark w-100 m-0 fw-bold featureText" id="camera_status_text">{{#if (isTrue
+                    cameraState)}}Camera Is On{{else}}Camera Is Off{{/if}}</p>
+            </div>
+
+
+            <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;">
+                <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="camera_status_switch" {{#if
+                    (isTrue cameraState)}}checked{{/if}}>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+<script>
+    // Connect to the WebSocket server
+    const socket = io();
+
+    // Listen for the 'dataUpdated' event
+    socket.on('dataUpdated', (data) => {
+        console.log('Data updated:', data);
+        location.reload();
+    });
+
+</script>
 
 
 <script>
 
-        // Door Status
-        var door_switch = document.getElementById("flexSwitchCheckChecked");
-        door_switch.addEventListener('change', async function () {
-            if (this.checked) {
-
-                var DoorStatus = {
-                    status: true
-                }
-                var Close = await fetch('/home/door', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(DoorStatus)
-                });
-
-
-                document.getElementById("door_status").innerHTML = "Door Close";
-                document.getElementById("ic_door").src = "/img/Door Close.svg";
-            } else {
-                
-                var door_time = document.getElementById('door-time');
-                var DoorStatus = {
-                    status: false,
-                    time: parseInt(door_time.value)
-                }
-                
-                var Open = await fetch('/home/door', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(DoorStatus)
-                });
-
-                setTimeout(() => {location.reload();}, parseInt(door_time.value))
-
-                document.getElementById("door_status").innerHTML = "Door Open";
-                document.getElementById("ic_door").src = "/img/Door Open.svg";
-
-            
-            }
-        })
-
-        // Method
-        var method_switch = document.getElementById("switchCheckedManual");
-    
-        method_switch.addEventListener('change', async function () {
-            if (this.checked) {
-                var workMethod = {
-                    isAuto: true
-                }
-                var Automatic = await fetch('/home/method', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(workMethod)
-                });
-
-                document.getElementById("cam_status").innerHTML = "Automatic";
-                document.getElementById("workMethod").src = "/img/auto.svg";
-                
-            } else {
-                var workMethod = {
-                    isAuto: false
-                }
-                var Manual = await fetch('/home/method', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(workMethod)
-                });
-
-                document.getElementById("cam_status").innerHTML = "Manual";
-                document.getElementById("workMethod").src = "/img/manual.svg";
-                
-            }
-        })
-
-        // JavaScript code to periodically update the image
-        function updateImage() {
-            const imageUrl = 'http://172.29.192.20/cam-mid.jpg';
-            const imgElement = document.getElementById('streamedImage');
-            
-            // Update the image source
-            imgElement.src = imageUrl + '?timestamp=' + new Date().getTime();
-            
-            // Set a timeout to update the image every 1000 milliseconds (1 second)
-            setTimeout(updateImage, 500);
+    // Camera Status
+    var cam_switch = document.getElementById("camera_status_switch");
+    cam_switch.addEventListener('change', async function () {
+        console.log("Change");
+        if (this.checked) {
+            console.log("Camera On");
+            updateImage();
+            document.getElementById("camera_status_ic").src = "/img/camera.svg";
+            document.getElementById("camera_status_text").innerHTML = "Camera Is On";
+        } else {
+            console.log("Camera Off");
+            document.getElementById("camera_status_ic").src = "/img/camera-off.svg";
+            document.getElementById("camera_status_text").innerHTML = "Camera Is Off";
         }
+    })
 
-        // Warnning
-        var warn_btn = document.querySelector('.warn-btn');
-        var warn_time = document.getElementById('warn-time');
-        var warn = {
-            warn: true,
-            time: parseInt(warn_time.value)
-        }
-        warn_btn.addEventListener('click', async function () {
-            var Warn = await fetch('/home/warn', {
+    // Door Status
+    var door_switch = document.getElementById("flexSwitchCheckChecked");
+    door_switch.addEventListener('change', async function () {
+        console.log("Change");
+        if (this.checked) {
+            console.log("Open");
+            var DoorStatus = {
+                Expectation: true
+            }
+            var Close = await fetch('/home/door', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(warn)
+                body: JSON.stringify(DoorStatus)
             });
 
-            
+            //location.reload();
+        } else {
+
+            var door_time = document.getElementById('door-time');
+            var DoorStatus = {
+                Expectation: false
+            }
+            console.log("Close");
+            var Open = await fetch('/home/door', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(DoorStatus)
+            });
+
+            //location.reload();
+        }
+    })
+
+
+    // JavaScript code to periodically update the image
+    function updateImage() {
+        if (document.getElementById('camera_status_switch').checked == false) return;
+        const imgElement = document.getElementById('streamedImage');
+        const imageUrl = imgElement.dataset.ip;
+
+        // Update the image source
+        imgElement.src = imageUrl + '?timestamp=' + new Date().getTime();
+
+        // Set a timeout to update the image every 1000 milliseconds (1 second)
+        setTimeout(updateImage, 500);
+    }
+
+
+    // Warnning
+    var warn_btn = document.querySelector('.warn-btn');
+    var warn_time = document.getElementById('warn-time');
+    var warn = {
+        warn: true,
+    }
+    warn_btn.addEventListener('click', async function () {
+        var Warn = await fetch('/home/warn', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(warn)
         });
+    });
 
-        // Stranger Alert
-        var alert_time = document.getElementById('alert-time');
-        
-        alert_time.addEventListener('change', async function() {
-            var alert = {
-                time: parseInt(this.value)
-            }
-            var Alert = await fetch('/home/alert', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(alert)
-            });
-        })
+
 </script>
+
+{{!-- Style --}}
+<style>
+    @media screen and (min-width: 600px) {
+        .navbar {
+            background-color: black;
+        }
+
+        .navbar-brand span {
+            color: rgb(52, 224, 161);
+        }
+
+        #notificationText {
+            font-size: 3em;
+        }
+
+        .featureBlock {
+            height: 5em;
+        }
+
+        .iconBlock {
+            width: 3.2em;
+            height: 3em;
+        }
+
+        #warningIc {
+            padding-top: 0.2em;
+        }
+
+        .IcPad {
+            padding-top: 0.4em;
+        }
+        .featureText{
+            font-size: 2em;
+        }
+        .featureFunctionText {
+            font-size: 1.7em;
+        }
+        .featureBtn {
+            padding: 0.2em 0;
+            line-height: 2.3em;
+        }
+    }
+
+    @media screen and (max-width: 500px) {
+        .navbar {
+            background-color: black;
+        }
+
+        .navbar-brand span {
+            color: rgb(52, 224, 161);
+        }
+
+        #notificationText {
+            font-size: 1.2em;
+        }
+
+        .featureBlock {
+            height: 4em;
+        }
+
+        .iconBlock {
+            width: 2.2em;
+            height: 1.8em;
+        }
+        .featureText{
+            font-size: 1.1em;
+        }
+
+        .featureFunctionText {
+            font-size: 0.7em;
+        }
+        .featureBtn {
+            line-height: 1em;
+        }
+    }
+</style>

@@ -1,25 +1,31 @@
 const express = require('express');
 const expressHbs = require('express-handlebars');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const firebase = require('firebase/compat/app');
 require('firebase/compat/auth');
 require('firebase/compat/database');
 require('firebase/compat/storage');
+require('firebase/compat/firestore');
+
 
 var AccessHistoryData = [];
 var SensorData = {};
 var DoorData = {};
-var StrangerAlert = {}
+var Warning = {}
 var UserData = {}
+var AccountData = {};
+var IP;
 
 
 const helpers = {
     checkTrue: require("./function/helpers")
 };
 
-
+// Alow send files
 const multer = require('multer');
 
+// Config FB
 const firebaseConfig = {
     apiKey: "AIzaSyDjFMvE_kklNMo-laMwK6oKAW7HejrhCzk",
     authDomain: "node-69d5e.firebaseapp.com",
@@ -35,17 +41,33 @@ const auth = firebase.auth();
 const storage = firebase.storage();
 const database = firebase.database();
 const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const fdb = firebase.firestore();
 
+// Use express-session middleware
+app.use(express.urlencoded({ extended: false }));
+app.use(
+    session({
+        secret: "SESSION_SECRET",
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            secure: false,
+            httpOnly: true, maxAge: 20 * 60 * 1000,
+        }
+    })
+)
 
 // Body parser
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
-const usersAccessHistoryRef = database.ref('Data');
+const usersAccessHistoryRef = database.ref('VisitorsTracking');
 const userSensorRef = database.ref('Sensor');
 const userDoorRef = database.ref('Door');
-const userStrangerAlertRef = database.ref('StrangerAlert');
+const userWarningRef = database.ref('Warning');
 const userConfig = database.ref('UserConfig');
+const cameraIP = database.ref('CameraIP');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -59,12 +81,18 @@ app.engine("hbs", expressHbs.engine({
     defaultLayout: "layout",
     helpers: {
         isTrue: helpers.checkTrue.isTrue,
-        convertFromMillis: helpers.checkTrue.convertFromMillis
+        convertFromMillis: helpers.checkTrue.convertFromMillis,
+        incValue: helpers.checkTrue.incValue
     }
 })
 );
 
 app.set("view engine", "hbs");
+
+// Function to notify all connected clients
+function notifyClients() {
+    io.emit('dataUpdated', { /* data you want to send to clients */ });
+}
 
 
 // Multer setup
@@ -83,42 +111,50 @@ app.get('/registerPage', (req, res) => {
     res.render('register');
 });
 
-userDoorRef.once('value', async (snapshot) => {
+// Camera IP
+cameraIP.on('value', async (snapshot) => {
+    // Handle the snapshot of data
+    IP = await snapshot.val();
+    notifyClients();
+
+});
+// Door State
+userDoorRef.on('value', async (snapshot) => {
     // Handle the snapshot of data
     DoorData = await snapshot.val();
-    // Update your UI or perform any other actions with the retrieved data
-    }, (error) => {
-            // Handle the error
+    notifyClients();
+
+}, (error) => {
+    // Handle the error
     console.log(error);
 });
 
-userStrangerAlertRef.once('value', async (snapshot) => {
-    // Handle the snapshot of data
-    StrangerAlert = await snapshot.val();
-    // Update your UI or perform any other actions with the retrieved data
-    }, (error) => {
-            // Handle the error
+// Warining
+userWarningRef.on('value', async (snapshot) => {
+    Warning = await snapshot.val();
+    notifyClients();
+
+}, (error) => {
+    // Handle the error
     console.log(error);
 });
 
-app.get('/home', (req, res) => {
-    userDoorRef.on('value', async (snapshot) => {
-        // Handle the snapshot of data
-        DoorData = await snapshot.val();
-        // Update your UI or perform any other actions with the retrieved data
-        }, (error) => {
-                // Handle the error
-        console.log(error);
+app.get('/home', async (req, res) => {
+
+    let cameraState = false;
+    // Account
+    const accountRef = fdb.collection("account");
+    const accountSnapshot = await accountRef.get();
+    let AccountData;
+
+    accountSnapshot.forEach((doc) => {
+        let data = doc.data();
+
+        if (data.email == req.session.email) {
+            AccountData = data;
+        }
     });
-    userStrangerAlertRef.on('value', async (snapshot) => {
-        // Handle the snapshot of data
-        StrangerAlert = await snapshot.val();
-        // Update your UI or perform any other actions with the retrieved data
-        }, (error) => {
-                // Handle the error
-        console.log(error);
-    });
-    res.render('home', {doorData: DoorData, strangerAlert: StrangerAlert});
+    res.render('home', { doorData: DoorData, cameraIP: IP, warning: Warning, account: AccountData, cameraState: cameraState });
 });
 
 app.get('/upload', (req, res) => {
@@ -127,7 +163,7 @@ app.get('/upload', (req, res) => {
 
 
 app.get('/home/faceID', async (req, res) => {
-    
+
     const storageRef = storage.ref("user_images/");
 
     try {
@@ -149,82 +185,72 @@ app.get('/home/faceID', async (req, res) => {
     }
 });
 
-// app.get('/download/:fileName', async (req, res) => {
-//     const { fileName } = req.params;
+app.get('/home/personalInfo', async (req, res) => {
+    try {
+        const accountRef = fdb.collection("account");
+        const accountSnapshot = await accountRef.get();
+        let AccountData;
 
-//     const storageRef = storage.ref();
-//     const fileRef = storageRef.child(fileName);
+        accountSnapshot.forEach((doc) => {
+            let data = doc.data();
 
-//     try {
-//         const downloadURL = await fileRef.getDownloadURL();
-//         res.redirect(downloadURL);
-//     } catch (error) {
-//         res.status(404).send('File not found');
-//     }
-// });
+            if (data.email == req.session.email) {
+                AccountData = data;
+            }
+        });
+        console.log("accountData: ", AccountData);
+        res.render('personalInfo', { account: AccountData });
+    } catch (error) {
+        console.error('Error fetching files:', error);
+        res.send('Error');
+    }
 
-userSensorRef.once('value', async (snapshot) => {
+    //res.render('personalInfo');
+});
+
+userSensorRef.on('value', async (snapshot) => {
     // Handle the snapshot of data
     SensorData = await snapshot.val();
     // Update your UI or perform any other actions with the retrieved data
-    }, (error) => {
-            // Handle the error
-    console.log(error);
-});
-
-app.get('/home/sensorStats', (req, res) => {
-    userSensorRef.on('value', async (snapshot) => {
-        // Handle the snapshot of data
-        SensorData = await snapshot.val();
-        // Update your UI or perform any other actions with the retrieved data
-        }, (error) => {
-                // Handle the error
-        console.log(error);
-    });
-    res.render('sensorStats',{sensorData: SensorData, pageTitle: "Sensor Stats"});
-});
-
-usersAccessHistoryRef.once('value', async (snapshot) => {
-    // Handle the snapshot of data
-    AccessHistoryData = await snapshot.val();
-    // Update your UI or perform any other actions with the retrieved data
-    }, (error) => {
-            // Handle the error
-    console.log(error);
-});
-
-app.get('/home/accessHistory', (req, res) => {
-    usersAccessHistoryRef.on('value', async (snapshot) => {
-        // Handle the snapshot of data
-        AccessHistoryData = await snapshot.val();
-        // Update your UI or perform any other actions with the retrieved data
-        }, (error) => {
-                // Handle the error
-        console.log(error);
-    });
-    res.render('accessHistory',{accessHistory: AccessHistoryData, pageTitle: "Access History"});
-});
-
-userConfig.once('value', async (snapshot) => {
-    // Handle the snapshot of data
-    UserData = await snapshot.val();
-    // Update your UI or perform any other actions with the retrieved data
-    }, (error) => {
+    notifyClients();
+}, (error) => {
     // Handle the error
     console.log(error);
 });
 
-app.get('/home/config', (req, res) => {
-    userConfig.on('value', async (snapshot) => {
-        // Handle the snapshot of data
-        UserData = await snapshot.val();
-        // Update your UI or perform any other actions with the retrieved data
-        }, (error) => {
-        // Handle the error
-        console.log(error);
-    });
+app.get('/home/sensorStats', (req, res) => {
+    
+    res.render('sensorStats', { sensorData: SensorData, pageTitle: "Sensor Stats" });
+});
 
-    res.render('config',{userData: UserData, pageTitle: "Config"});
+
+usersAccessHistoryRef.on('value', async (snapshot) => {
+    // Handle the snapshot of data
+    AccessHistoryData = await snapshot.val();
+    notifyClients();
+    // Update your UI or perform any other actions with the retrieved data
+}, (error) => {
+    // Handle the error
+    console.log(error);
+});
+
+app.get('/home/accessHistory', (req, res) => {
+    res.render('accessHistory', { accessHistory: AccessHistoryData, pageTitle: "Access History" });
+});
+
+
+
+userConfig.on('value', async (snapshot) => {
+    // Handle the snapshot of data
+    UserData = await snapshot.val();
+    notifyClients();
+}, (error) => {
+    // Handle the error
+    console.log(error);
+});
+app.get('/home/config', (req, res) => {
+
+    res.render('config', { userData: UserData, pageTitle: "Config" });
 });
 
 
@@ -233,7 +259,15 @@ app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
+        .then((userCredential) => {
+            // Store user email in session
+            req.session.email = email;
+            // Successfully registered
+            const user = userCredential.user;
+            const uid = user.uid;
+            console.log("User UID:", uid);
+
+
             // Successfully logged in
             res.redirect('/home');
         })
@@ -247,8 +281,31 @@ app.post('/register', (req, res) => {
     const { email, password } = req.body;
 
     auth.createUserWithEmailAndPassword(email, password)
-        .then(() => {
+        .then((userCredential) => {
             // Successfully registered
+            const user = userCredential.user;
+            const uid = user.uid;
+            console.log("User UID:", uid);
+
+            // Set up user data in firestore
+            const collectionName = 'account';
+            const customId = uid;
+            const accountData = {
+                UID: uid,
+                email: email,
+                url: "",
+                username: email,
+            };
+
+            // Add a new document with a generated id.
+            fdb.collection(collectionName).doc(customId).set(accountData)
+                .then(() => {
+                    console.log("Document successfully written!");
+                })
+                .catch((error) => {
+                    console.error("Error writing document: ", error);
+                });
+
             res.send('Registered successfully!');
         })
         .catch((error) => {
@@ -257,54 +314,65 @@ app.post('/register', (req, res) => {
         });
 });
 
-// app.post('/upload', upload.single('file'), async (req, res) => {
-//     const { file } = req;
 
-//     if (!file) {
-//         return res.status(400).send('No file uploaded');
-//     }
+app.post('/upload', upload.array('files', 5), async (req, res) => {
+    const files = req.files || [];
+    const { id } = req.body;
 
-//     const storageRef = storage.ref();
-//     const fileRef = storageRef.child(file.originalname);
-//     await fileRef.put(file.buffer);
+    console.log("uID: ", id);
 
-//     res.send('File uploaded successfully!');
-// });
-
-app.post('/upload', upload.array('files'), async (req, res) => {
-    const { files } = req;
-
-    if (!files || files.length === 0) {
+    if (files.length === 0) {
         return res.status(400).send('No files uploaded');
     }
 
-    const storageRef = storage.ref("user_images/");
-
-    // Use Promise.all to upload multiple files concurrently
-    await Promise.all(files.map(async (file) => {
-        const fileRef = storageRef.child(file.originalname);
+    const uploadTasks = files.map(async (file, index) => {
+        const temp = file.originalname.split('.');
+        const extFileName = temp[temp.length - 1];
+        const fileRef = storage.ref(`user_images/${id}.${extFileName}`);
         await fileRef.put(file.buffer);
-    }));
+        const downloadURL = await fileRef.getDownloadURL();
+
+        const collectionName = 'account';
+        const docID = `${id}`;
+        const accountData = {
+            url: downloadURL,
+        };
+
+        // Use set with merge option to ensure the document is created or updated
+        await fdb.collection(collectionName).doc(docID).set(accountData, { merge: true });
+    });
+
+
+    // Wait for all upload tasks to finish
+    await Promise.all(uploadTasks);
 
     res.send('Files uploaded successfully!');
 });
 
-app.post('/home/warn', async (req, res) => {
-    const { warn, time } = req.body;
-    const warnData = {
-        warn: warn
-    }
-    
-    await database.ref('Buzzer').update(warnData);
-    res.send('Warned successfully!');
+app.put('/home/personalInfo', async (req, res) => {
+    const { username, uid } = req.body;
 
-    setTimeout(async () => {
-        const warnData = {
-            warn: false
-        }
-        await database.ref('Buzzer').update(warnData);
-        
-    }, time);
+    console.log(uid, username);
+
+    const collectionName = 'account';
+    const docID = uid;
+    const accountData = {
+        username: username,
+    };
+
+    // Use set with merge option to ensure the document is created or updated
+    await fdb.collection(collectionName).doc(docID).set(accountData, { merge: true });
+
+    res.send('Updated successfully!');
+});
+
+app.post('/home/warn', async (req, res) => {
+    const { warn } = req.body;
+    const warnData = {
+        Expectation: warn
+    }
+    await database.ref('Warning').update(warnData);
+    res.send('Warned successfully!');
 });
 
 
@@ -313,29 +381,19 @@ app.post('/home/method', async (req, res) => {
     const WorkMethodData = {
         isAuto: isAuto
     }
-    
+
     await database.ref('WorkMethod').update(WorkMethodData);
     res.send('Change workMethod successfully!');
 });
 
 app.post('/home/door', async (req, res) => {
-    const { status, time } = req.body;
+    const { Expectation } = req.body;
     const DoorStatus = {
-        status: status,
+        Expectation: Expectation,
     }
-    
+
     await database.ref('Door').update(DoorStatus);
     res.send('Change Door Status successfully!');
-
-    if (status == false) {
-        setTimeout(async () => {
-            const DoorStatus = {
-                status: true
-            }
-            await database.ref('Door').update(DoorStatus);
-            
-        }, time);
-    }
 });
 
 app.post('/home/alert', async (req, res) => {
@@ -343,7 +401,7 @@ app.post('/home/alert', async (req, res) => {
     const StrangerAlert = {
         time: time,
     }
-    
+
     await database.ref('StrangerAlert').update(StrangerAlert);
     res.send('Change Stranger Alert Time successfully!');
 
@@ -351,8 +409,8 @@ app.post('/home/alert', async (req, res) => {
 
 // Put
 app.put('/home/config', async (req, res) => {
-    const { 
-        autoClose, 
+    const {
+        autoClose,
         autoOpen,
         camera,
         checkingDistance,
@@ -374,24 +432,34 @@ app.put('/home/config', async (req, res) => {
         FaceRegconition: faceRegconition ? true : false,
         GestureControl: gestureControl ? true : false,
         StrangerDetection: strangerDetect ? true : false,
-        StrangerWarningTime: strangerWarningTime ? true : 0,
-        VisitorTracking: visitorTracking ? true : false,
+        StrangerWarningTime: strangerWarningTime ? parseInt(strangerWarningTime) : 0,
+        VisitorsTracking: visitorTracking ? true : false,
         WarningNotification: warningNotification ? true : false,
         SmartDoorSystem: smartDoorSystem ? true : false
     }
-    try{
+    try {
         await database.ref('UserConfig').update(configData);
         res.send('Warned successfully!');
-    }catch(error){
+    } catch (error) {
         console.log(error);
         res.send('Error!');
     }
-    
+
 });
 
+// WebSocket connection
+io.on('connection', (socket) => {
+    console.log('DataBase Updated');
+
+    // Disconnect event
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+http.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+

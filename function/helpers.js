@@ -22,7 +22,12 @@ function convertFromMillis(time) {
     return realTime;
 }
 
+function incValue(value) {
+    return value + 1;
+}
+
 module.exports = {
     isTrue: isTrue,
-    convertFromMillis: convertFromMillis
+    convertFromMillis: convertFromMillis,
+    incValue: incValue
 }

@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Download</title>
-
-    <style>
+<style>
         #drop-area {
             border: 2px dashed #ccc;
             border-radius: 8px;
@@ -18,43 +10,57 @@
             background-color: #f0f8ff; /* Light Blue */
         }
     </style>
-</head>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">Thông tin cá nhân</h4>
 
-<body>
-    <div class="container-fluid">
-        <h1 class="mb-2">Face ID Regconition</h1>
-    
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary btn-md my-2" data-bs-toggle="modal" data-bs-target="#modalId"
-            style="float: right;">
-            Add Face ID
-        </button>
-        
-        {{!-- <img src="{{url}}" alt="Image"> --}}
-        <table class="table table-hover text-center">
-            <thead>
-                <tr>
-                    <th scope="col">Existed Face ID</th>
-                </tr>
-            <tbody>
-                {{#each paths}}
-                    <tr>
-                        {{!-- <img src="{{url}}" alt=""> --}}
-                        <td scope="col">
-                            <img src="{{url}}" alt="avatar" 
-                                    class="dropdown-toggle object-fit-contain rounded-4" 
-                                        data-bs-toggle="dropdown" aria-expanded="false"
-                                            style="margin-left: auto; margin-right: 1em; width: 10em; border: 3px solid rgb(52,224,161)">
-                        </td>
-                    </tr>
-                {{/each}}
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <h5 class="card-header">Chi tiết</h5>
+                <!-- Account -->
+                <div class="card-body">
+                    <div class="d-flex align-items-start align-items-sm-center gap-4">
+                        <img src="{{#if account.url}}{{account.url}}{{else}}/img/avt.jpg{{/if}}"
+                            alt="user-avatar" class="d-block rounded" height="100" width="100" id="uploadedAvatar" />
+                        <div class="button-wrapper">
+                            <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0" data-bs-toggle="modal" data-bs-target="#modalId">
+                                <span class="d-sm-block">Tải lên ảnh mới</span>
+                                <i class="bx bx-upload d-block d-sm-none"></i>
+                            </label>
+                            <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
+                                <i class="bx bx-reset d-block d-sm-none"></i>
+                                <span class="d-sm-block">Reset</span>
+                            </button>
+
+                            <p class="text-muted mb-0">Cho phép JPG, GIF hoặc PNG. Kích thước tối đa 800KB</p>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-0" />
+                <div class="card-body">
+                    <form id="formAccountSettings" onsubmit="accSettings(event)">
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="name" class="form-label">Tên</label>
+                                <input class="form-control" type="text" id="name" name="username"
+                                    value="{{account.username}}" />
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <input type="text" name="uid" value="{{account.UID}}" hidden>
+                            <button type="submit" class="btn btn-primary me-2">Lưu</button>
+                            <button type="reset" class="btn btn-outline-secondary">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /Account -->
+            </div>
+
+        </div>
     </div>
-    
+</div>
 
-
-    <!-- Modal -->
+    <!-- Upload Modal -->
     <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
         <form id="ReportForm" enctype="multipart/form-data">
             <div class="modal-dialog modal-dialog-centered  modal-sm" role="document" style="width: 70%; margin-left: auto; margin-right: auto;">
@@ -77,6 +83,7 @@
                                     to select
                                 </p>
                                 <input type="file" id="fileInput" class="d-none" name="FileInput" multiple >
+                                <input type="hidden" name="id" id="id" value="{{account.UID}}" />
                                 <div class="w-100">
                                     <ul id="file-list" class="d-none"></ul>
                                 </div>
@@ -89,9 +96,6 @@
                                 Save
                             </button>
                         </div>
-
-
-
                     </div>
 
                 </div>
@@ -159,6 +163,7 @@
                 formData.append('files', files[i]);
             }
     
+            formData.append('id', document.getElementById('id').value);
             // Use Fetch API to send files to the server
             fetch('/upload', {
                 method: 'POST',
@@ -170,11 +175,25 @@
                     // Optionally, reset the fileStorage array and clear the file list
                     fileStorage = [];
                     document.getElementById('file-list').innerHTML = '';
-                    //location.reload();
+                    location.reload();
                 })
                 .catch(error => console.error('Error uploading files:', error));
         });
-    </script>
-</body>
 
-</html>
+        async function accSettings(e) {
+            e.preventDefault()
+
+            const formData = new FormData(document.getElementById("formAccountSettings"))
+            const data = Object.fromEntries(formData.entries())
+
+            let res = await fetch('/home/personalInfo', {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            })
+
+            location.reload();
+        }
+    </script>

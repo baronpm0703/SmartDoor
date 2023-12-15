@@ -1,28 +1,21 @@
 <div class="container mt-5">
     <h1>{{pageTitle}}</h1>
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th scope="col">Index</th>
-                    <th scope="col">Type</th>
                     <th scope="col">Name</th>
+                    <th scope="col">Visit Time </th>
                     <!-- Add more columns as needed -->
                 </tr>
             </thead>
             <tbody>
                 {{#each accessHistory}}
                 <tr>
-                    <th scope="row">{{@index}}</th>
-                    <td scope="col">
-                        {{#if (isTrue stranger)}}
-                            Stranger
-                        {{else}}
-                            Family
-                        {{/if}}
-
-                    </td>
-                    <td scope="col">{{name}}</td>
+                    <th scope="col">{{incValue @index}}</th>
+                    <td scope="col">{{Name}}</td>
+                    <td scope="col">{{VisitTime}}</td>
                 </tr>
                 {{/each}}
             </tbody>
@@ -30,11 +23,16 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        setInterval(() => {
-            location.reload();
-        }, 3000);
+    // Connect to the WebSocket server
+    const socket = io();
+
+    // Listen for the 'dataUpdated' event
+    socket.on('dataUpdated', (data) => {
+        console.log('Data updated:', data);
+        location.reload();
     });
+
 </script>

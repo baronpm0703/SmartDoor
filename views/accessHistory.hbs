@@ -1,12 +1,17 @@
-<div class="container mt-5">
-    <h1>{{pageTitle}}</h1>
-    <div class="table-responsive">
+<style>
+    body {
+        background-color: rgb(52,224,161);
+    }
+</style>
+<div class="container mt-1" >
+    <h1 class="">{{pageTitle}}</h1>
+    <div class="table-responsive rounded-4" >
         <table class="table table-hover">
-            <thead>
+            <thead class="table-dark">
                 <tr>
-                    <th scope="col">Index</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Visit Time </th>
+                    <th scope="col" style="color: rgb(52,224,161)">Index</th>
+                    <th scope="col" style="color: rgb(52,224,161)">Name</th>
+                    <th scope="col" style="color: rgb(52,224,161)">Visit Time </th>
                     <!-- Add more columns as needed -->
                 </tr>
             </thead>
@@ -24,7 +29,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-
+{{!-- 
 <script>
     // Connect to the WebSocket server
     const socket = io();
@@ -35,4 +40,4 @@
         location.reload();
     });
 
-</script>
+</script> --}}

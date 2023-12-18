@@ -112,23 +112,31 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
 .baocao-table-container {
     padding: 0 0.8rem;
 }
+thead th {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--title-color);
+    text-align: start;
+    padding: 0.8rem 0;
 
+}
 </style>
 
 <div class="baocao-container">
     {{!-- Header--}}
     <div class="baocao-header">
-        <h1>{{pageTitle}}</h1>
+        <h1 class="text-primary">{{pageTitle}}</h1>
     </div>
-
-
     {{!-- Table --}}
-    <div class="baocao-table-container">
+    <div class="baocao-table-container" >
         <form action="" id="editConfigForm" onsubmit="editConfig(event)">
-            <table class="table table-hover">
-                <thead>
-                    <th scope="col">Function</th>
-                    <th scope="col">Status</th>
+            <div class="table-responsive rounded-4">
+                <table class="table table-hover " >
+                <thead class="table-primary ">
+                    <tr>
+                        <th scope="col" class="text-primary">Function</th>
+                        <th scope="col" class="text-primary">Status</th>
+                    </tr>
                 </thead>
                 <tbody>
                         <tr>
@@ -136,7 +144,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Auto Door Close
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="autoClose" name="autoClose" {{#if (isTrue userData.AutoClose)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -146,7 +154,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Auto Door Open
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="autoOpen" name="autoOpen" {{#if (isTrue userData.AutoOpen)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -156,7 +164,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Camera 
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="cameraStatus" name="camera" {{#if (isTrue userData.Camera)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -166,7 +174,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Detect Distances Range 
                             </td>
                             <td scope="col">
-                                <div class="d-flex justify-content-center" style="width: 6rem; height: 1.5em;" >
+                                <div class="d-flex " style="width: 6rem; height: 1.7em;" >
                                 <input class="form-control w-100 h-100" type="text" id="checkingDistance" name="checkingDistance" value="{{userData.CheckingDistance}}">
                                 </div>
                             </td>
@@ -176,17 +184,17 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Door Closing Time
                             </td>
                             <td scope="col">
-                                <div class="d-flex justify-content-center" style="width: 6rem; height: 1.5em;" >
+                                <div class="d-flex " style="width: 6rem; height: 1.7em;" >
                                 <input class="form-control w-100 h-100" type="text" id="doorClosingTime" name="closingTime"  value="{{userData.DoorCloseTime}}">
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td scope="col">
-                                Face Regconition 
+                                Face Recognition 
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="faceRegconition" name="faceRegconition" {{#if (isTrue userData.FaceRecognition)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -196,7 +204,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Gesture Control
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="gestureControl" name="gestureControl" {{#if (isTrue userData.GestureControl)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -206,7 +214,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Smart Door System
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="smartDoorSystem" name="smartDoorSystem" {{#if (isTrue userData.SmartDoorSystem)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -216,7 +224,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Stranger Detection
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="strangerDetect" name="strangerDetect"{{#if (isTrue userData.StrangerDetection)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -226,7 +234,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Strange Warning Time 
                             </td>
                             <td scope="col">
-                                <div class="d-flex justify-content-center" style="width: 6rem; height: 1.5em;" >
+                                <div class="d-flex " style="width: 6rem; height: 1.7em;" >
                                 <input class="form-control w-100 h-100" type="text" id="strangerWarningTime" name="strangerWarningTime" value="{{userData.StrangerWarningTime}}">
                                 </div>
                             </td>
@@ -236,7 +244,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Visitor Tracking
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="visitorTracking" name="visitorTracking"{{#if (isTrue userData.VisitorsTracking)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -246,7 +254,7 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                                 Warning Notification
                             </td>
                             <td scope="col">
-                                <div class="form-check form-switch d-flex justify-content-center" style="width: 6rem; height: 1em;" >
+                                <div class="form-check form-switch d-flex " style="width: 6rem; height: 1em;" >
                                     <input class="form-check-input w-100 h-75" type="checkbox" role="switch" id="warningNotification" name="warningNotification"{{#if (isTrue userData.WarningNotification)}}checked{{/if}}>
                                 </div>
                             </td>
@@ -254,6 +262,8 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
                 </tbody>
             </table>
 
+            
+            </div>
             <div class="d-flex justify-content-end">
                 <button class="btn btn-primary" id="saveConfig" type="submit">Save</button>
             </div>
@@ -262,8 +272,21 @@ table .table-detail-button,.delete-button,.ttqc-delete-button,.edit-button {
 </div>
 
 
-<script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 
+<script>
+    // Connect to the WebSocket server
+    const socket = io();
+
+    // Listen for the 'dataUpdated' event
+    socket.on('dataUpdated', (data) => {
+        console.log('Data updated:', data);
+        location.reload();
+    });
+
+</script>
+
+<script>
     async function editConfig(e) {
         e.preventDefault()
 

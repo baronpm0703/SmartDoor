@@ -26,8 +26,24 @@ function incValue(value) {
     return value + 1;
 }
 
+function convertDistance(value) {
+    var metres = value / 100; // from cm to m
+
+    var res = "";
+    if (metres >= 1) {
+        res = metres + "m ";
+    }
+    else {
+        return value + "cm";
+    }
+
+    return res;
+
+}
+
 module.exports = {
     isTrue: isTrue,
     convertFromMillis: convertFromMillis,
-    incValue: incValue
+    incValue: incValue,
+    convertDistance: convertDistance
 }

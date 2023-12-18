@@ -1,6 +1,7 @@
 const express = require('express');
 const expressHbs = require('express-handlebars');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const firebase = require('firebase/compat/app');
 require('firebase/compat/auth');
@@ -16,6 +17,7 @@ var Warning = {}
 var UserData = {}
 var AccountData = {};
 var IP;
+var cameraState;
 
 
 const helpers = {
@@ -45,19 +47,9 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const fdb = firebase.firestore();
 
-// Use express-session middleware
+// Use express-cookie middleware
 app.use(express.urlencoded({ extended: false }));
-app.use(
-    session({
-        secret: "SESSION_SECRET",
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-            secure: false,
-            httpOnly: true, maxAge: 20 * 60 * 1000,
-        }
-    })
-)
+app.use(cookieParser());
 
 // Body parser
 app.use(bodyParser.json());
@@ -68,6 +60,7 @@ const userDoorRef = database.ref('Door');
 const userWarningRef = database.ref('Warning');
 const userConfig = database.ref('UserConfig');
 const cameraIP = database.ref('CameraIP');
+const webCamState = database.ref('WebCamera');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -82,7 +75,8 @@ app.engine("hbs", expressHbs.engine({
     helpers: {
         isTrue: helpers.checkTrue.isTrue,
         convertFromMillis: helpers.checkTrue.convertFromMillis,
-        incValue: helpers.checkTrue.incValue
+        incValue: helpers.checkTrue.incValue,
+        convertDistance: helpers.checkTrue.convertDistance
     }
 })
 );
@@ -111,10 +105,24 @@ app.get('/registerPage', (req, res) => {
     res.render('register');
 });
 
+app.get('/home/logout', (req, res) => {
+    res.clearCookie('email');
+    res.redirect('/loginPage');
+});
+
 // Camera IP
 cameraIP.on('value', async (snapshot) => {
     // Handle the snapshot of data
     IP = await snapshot.val();
+    notifyClients();
+
+});
+
+
+// Camera State
+webCamState.on('value', async (snapshot) => {
+    // Handle the snapshot of data
+    cameraState = await snapshot.val();
     notifyClients();
 
 });
@@ -129,7 +137,7 @@ userDoorRef.on('value', async (snapshot) => {
     console.log(error);
 });
 
-// Warining
+// Warning
 userWarningRef.on('value', async (snapshot) => {
     Warning = await snapshot.val();
     notifyClients();
@@ -139,9 +147,17 @@ userWarningRef.on('value', async (snapshot) => {
     console.log(error);
 });
 
-app.get('/home', async (req, res) => {
+userSensorRef.on('value', async (snapshot) => {
+    // Handle the snapshot of data
+    SensorData = await snapshot.val();
+    // Update your UI or perform any other actions with the retrieved data
+    notifyClients();
+}, (error) => {
+    // Handle the error
+    console.log(error);
+});
 
-    let cameraState = false;
+app.get('/home', async (req, res) => {
     // Account
     const accountRef = fdb.collection("account");
     const accountSnapshot = await accountRef.get();
@@ -150,11 +166,12 @@ app.get('/home', async (req, res) => {
     accountSnapshot.forEach((doc) => {
         let data = doc.data();
 
-        if (data.email == req.session.email) {
+        if (data.email == req.cookies.email) {
             AccountData = data;
         }
     });
-    res.render('home', { doorData: DoorData, cameraIP: IP, warning: Warning, account: AccountData, cameraState: cameraState });
+    console.log(IP)
+    res.render('home', {sensorData: SensorData, doorData: DoorData, cameraIP: IP, warning: Warning, account: AccountData, cameraState: cameraState.value });
 });
 
 app.get('/upload', (req, res) => {
@@ -194,7 +211,7 @@ app.get('/home/personalInfo', async (req, res) => {
         accountSnapshot.forEach((doc) => {
             let data = doc.data();
 
-            if (data.email == req.session.email) {
+            if (data.email == req.cookies.email) {
                 AccountData = data;
             }
         });
@@ -208,25 +225,14 @@ app.get('/home/personalInfo', async (req, res) => {
     //res.render('personalInfo');
 });
 
-userSensorRef.on('value', async (snapshot) => {
-    // Handle the snapshot of data
-    SensorData = await snapshot.val();
-    // Update your UI or perform any other actions with the retrieved data
-    notifyClients();
-}, (error) => {
-    // Handle the error
-    console.log(error);
-});
 
-app.get('/home/sensorStats', (req, res) => {
-    
-    res.render('sensorStats', { sensorData: SensorData, pageTitle: "Sensor Stats" });
-});
 
 
 usersAccessHistoryRef.on('value', async (snapshot) => {
     // Handle the snapshot of data
     AccessHistoryData = await snapshot.val();
+    AccessHistoryData = Object.values(AccessHistoryData).reverse();
+    //AccessHistoryData.reverse();
     notifyClients();
     // Update your UI or perform any other actions with the retrieved data
 }, (error) => {
@@ -250,9 +256,8 @@ userConfig.on('value', async (snapshot) => {
 });
 app.get('/home/config', (req, res) => {
 
-    res.render('config', { userData: UserData, pageTitle: "Config" });
+    res.render('config', { userData: UserData, pageTitle: "Config Customization" });
 });
-
 
 // Post
 app.post('/login', (req, res) => {
@@ -260,14 +265,14 @@ app.post('/login', (req, res) => {
 
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            // Store user email in session
-            req.session.email = email;
+            // Store user email in cookie
+            res.cookie('email', email, { httpOnly: true });
             // Successfully registered
             const user = userCredential.user;
             const uid = user.uid;
             console.log("User UID:", uid);
-
-
+            
+            setCameraState();
             // Successfully logged in
             res.redirect('/home');
         })
@@ -313,7 +318,6 @@ app.post('/register', (req, res) => {
             res.send(`Registration failed: ${error.message}`);
         });
 });
-
 
 app.post('/upload', upload.array('files', 5), async (req, res) => {
     const files = req.files || [];
@@ -375,6 +379,12 @@ app.post('/home/warn', async (req, res) => {
     res.send('Warned successfully!');
 });
 
+app.post('/home/webCam', async (req, res) => {
+    const { cameraState } = req.body;
+    const data = cameraState;
+    await database.ref('WebCamera').update({value: data});
+    res.send('Warned successfully!');
+});
 
 app.post('/home/method', async (req, res) => {
     const { isAuto } = req.body;
@@ -456,6 +466,12 @@ io.on('connection', (socket) => {
         console.log('User disconnected');
     });
 });
+
+// Initial Camera State
+async function setCameraState() {
+    const data = false;
+    await database.ref('WebCamera').update({value: data});
+}
 
 // Start the server
 const PORT = process.env.PORT || 3000;

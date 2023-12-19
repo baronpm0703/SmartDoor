@@ -311,7 +311,7 @@ app.post('/register', (req, res) => {
                     console.error("Error writing document: ", error);
                 });
 
-            res.send('Registered successfully!');
+            res.redirect('/loginPage');
         })
         .catch((error) => {
             // Handle registration error

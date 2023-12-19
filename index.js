@@ -94,11 +94,18 @@ const upload = multer();
 
 // Routes
 app.get('/', (req, res) => {
+    res.clearCookie('email');
     res.redirect('/loginPage');
 });
 
 app.get('/loginPage', (req, res) => {
-    res.render('login');
+    let {status} = req.query;
+    if (status == 401) {
+        res.render('login', {message: "You must login first!"});
+    }
+    else {
+        res.render('login');
+    }
 });
 
 app.get('/registerPage', (req, res) => {
@@ -157,7 +164,7 @@ userSensorRef.on('value', async (snapshot) => {
     console.log(error);
 });
 
-app.get('/home', async (req, res) => {
+app.get('/home', checkAuthenticated, async (req, res) => {
     // Account
     const accountRef = fdb.collection("account");
     const accountSnapshot = await accountRef.get();
@@ -179,7 +186,7 @@ app.get('/upload', (req, res) => {
 });
 
 
-app.get('/home/faceID', async (req, res) => {
+app.get('/home/faceID', checkAuthenticated, async (req, res) => {
 
     const storageRef = storage.ref("user_images/");
 
@@ -202,7 +209,7 @@ app.get('/home/faceID', async (req, res) => {
     }
 });
 
-app.get('/home/personalInfo', async (req, res) => {
+app.get('/home/personalInfo', checkAuthenticated, async (req, res) => {
     try {
         const accountRef = fdb.collection("account");
         const accountSnapshot = await accountRef.get();
@@ -225,9 +232,6 @@ app.get('/home/personalInfo', async (req, res) => {
     //res.render('personalInfo');
 });
 
-
-
-
 usersAccessHistoryRef.on('value', async (snapshot) => {
     // Handle the snapshot of data
     AccessHistoryData = await snapshot.val();
@@ -240,11 +244,9 @@ usersAccessHistoryRef.on('value', async (snapshot) => {
     console.log(error);
 });
 
-app.get('/home/accessHistory', (req, res) => {
+app.get('/home/accessHistory', checkAuthenticated, (req, res) => {
     res.render('accessHistory', { accessHistory: AccessHistoryData, pageTitle: "Access History" });
 });
-
-
 
 userConfig.on('value', async (snapshot) => {
     // Handle the snapshot of data
@@ -254,7 +256,7 @@ userConfig.on('value', async (snapshot) => {
     // Handle the error
     console.log(error);
 });
-app.get('/home/config', (req, res) => {
+app.get('/home/config', checkAuthenticated, (req, res) => {
 
     res.render('config', { userData: UserData, pageTitle: "Config Customization" });
 });
@@ -471,6 +473,14 @@ io.on('connection', (socket) => {
 async function setCameraState() {
     const data = false;
     await database.ref('WebCamera').update({value: data});
+}
+function checkAuthenticated(req, res, next) {
+    const token = req.cookies.email;
+    
+    if (!token) {
+        return res.redirect('/loginPage?status=401');
+    }
+    return next();
 }
 
 // Start the server

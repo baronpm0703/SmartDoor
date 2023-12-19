@@ -5,6 +5,7 @@
         <span class="text-dark mx-1" style="font-weight: 500; font-size: 2.3em;">Smart Door</span>
     </div>
     <div class="container d-flex flex-column mb-2">
+        {{#if message }}<span class="fs-3 text-danger fw-medium">{{message}}</span> {{/if}}
         <span class="fs-2 text-dark fw-medium">SIGN IN</span>
         <form action="/login" method="post" class="w-100 px-1">
             <div class="my-2">

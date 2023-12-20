@@ -41,9 +41,16 @@ function convertDistance(value) {
 
 }
 
+function smallerThan(value1, value2) {
+    if (value1 <= value2) return true;
+    return false;
+
+}
+
 module.exports = {
     isTrue: isTrue,
     convertFromMillis: convertFromMillis,
     incValue: incValue,
-    convertDistance: convertDistance
+    convertDistance: convertDistance,
+    smallerThan: smallerThan
 }

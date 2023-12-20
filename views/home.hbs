@@ -69,23 +69,46 @@
             {{/if}}
         </div>
 
-        <div class="container-fluid featureBlock  w-75 d-flex flex-row align-items-center rounded-4 my-3"
-            style=" background-color: rgb(52,224,161)">
+        {{#if (smallerThan sensorData.Ultrasonic userData.CheckingDistance)}}
+            <div class="container-fluid featureBlock  w-75 d-flex flex-row align-items-center rounded-4 my-3"
+                style=" background-color: rgb(52,224,161)">
 
-            <div class="bg-dark text-center rounded-circle IcPad iconBlock ms-1">
-                <img src="/img/Info.svg" alt="info" class="w-75">
-            </div>
+                <div class="bg-dark text-center rounded-circle IcPad iconBlock ms-1">
+                    <img src="/img/check.svg" alt="info" class="w-75">
+                </div>
 
-            <div class="w-75 ms-2  me-1">
-                <p class="text-dark w-100 m-0 fw-bold featureText">Distance</p>
-            </div>
+                <div class="w-75 ms-2  me-1">
+                    <p class="text-dark w-100 m-0 fw-bold featureText">In Distance</p>
+                </div>
 
-            <div class="bg-dark w-25 rounded-4 d-flex justify-content-center featureBtn">
-                <span class="fw-bold featureFunctionText" style="color: rgb(52,224,161);">
-                    {{convertDistance sensorData.Ultrasonic}}
-                </span>
-            </div>
-        </div>
+                <div class="bg-dark w-25 rounded-4 d-flex justify-content-center featureBtn">
+                    <span class="fw-bold featureFunctionText" 
+                        style="color: rgb(52,224,161);">
+                        {{convertDistance sensorData.Ultrasonic}}
+                    </span>
+                </div>
+            </div> 
+        {{else}}
+            <div class="container-fluid featureBlock  w-75 d-flex flex-row align-items-center rounded-4 my-3"
+                    style=" background-color: red">
+
+                    <div class="bg-light text-center rounded-circle IcPad iconBlock ms-1">
+                        <img src="/img/x.svg" alt="info" class="w-75">
+                    </div>
+
+                    <div class="w-75 ms-2  me-1">
+                        <p class="text-light w-100 m-0 fw-bold featureText">Out Of Distance  </p>
+                    </div>
+
+                    <div class="bg-light w-25 rounded-4 d-flex justify-content-center featureBtn">
+                        <span class="fw-bold featureFunctionText" 
+                            style=" color: red;">
+                            {{convertDistance sensorData.Ultrasonic}}
+                        </span>
+                    </div>
+            </div>  
+        {{/if}}
+        
 
         <div class="container-fluid featureBlock w-75 d-flex flex-row align-items-center rounded-4 my-3"
             style=" background-color: rgb(52,224,161)">
@@ -211,7 +234,7 @@
             font-size: 1.7em;
         }
         .warn-btn {
-            width: 10em;
+            width: 12em;
         }
         .off-warn-btn {
             width: 10em;
@@ -376,6 +399,8 @@
         var x = window.matchMedia("(max-width: 500px)")
         if (x.matches) {
             warn_btn.style.display = "none";
+        } else {
+            warn_btn.style.width = "8em";
         }
             
     }

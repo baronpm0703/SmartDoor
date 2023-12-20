@@ -76,7 +76,8 @@ app.engine("hbs", expressHbs.engine({
         isTrue: helpers.checkTrue.isTrue,
         convertFromMillis: helpers.checkTrue.convertFromMillis,
         incValue: helpers.checkTrue.incValue,
-        convertDistance: helpers.checkTrue.convertDistance
+        convertDistance: helpers.checkTrue.convertDistance,
+        smallerThan: helpers.checkTrue.smallerThan
     }
 })
 );
@@ -178,7 +179,7 @@ app.get('/home', checkAuthenticated, async (req, res) => {
         }
     });
     console.log(IP)
-    res.render('home', {sensorData: SensorData, doorData: DoorData, cameraIP: IP, warning: Warning, account: AccountData, cameraState: cameraState.value });
+    res.render('home', {sensorData: SensorData, doorData: DoorData, cameraIP: IP, warning: Warning, account: AccountData, cameraState: cameraState.value, userData: UserData });
 });
 
 app.get('/upload', (req, res) => {

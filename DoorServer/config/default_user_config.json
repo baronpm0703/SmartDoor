@@ -1,0 +1,14 @@
+{
+    "AutoClose": true,
+    "AutoOpen": true,
+    "Camera": true,
+    "CheckingDistance": 20,
+    "DoorCloseTime": 5,
+    "FaceRecognition": true,
+    "GestureControl": true,
+    "SmartDoorSystem": true,
+    "StrangerDetection": true,
+    "StrangerWarningTime": 60,
+    "VisitorsTracking": true,
+    "WarningNotification": true
+}

@@ -1,0 +1,7 @@
+{
+    "apiKey": "AIzaSyDjFMvE_kklNMo-laMwK6oKAW7HejrhCzk",
+    "authDomain": "node-69d5e.firebaseapp.com",
+    "databaseURL": "https://node-69d5e-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    "storageBucket": "node-69d5e.appspot.com",
+    "serviceAccount": "ServerData/CredentialsCertificate/node-69d5e-firebase-adminsdk-bhf63-b190f3d480.json"
+}

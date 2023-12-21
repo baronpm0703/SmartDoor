@@ -458,7 +458,7 @@ def main():
                                     writeDataRTDB(path="Door/Expectation", data=True, success_notification=True)
 
                             # Stranger Warning Off
-                            if readDataRTDB(path="Warning/Expectation"):
+                            if not readDataRTDB(path="Warning/Manual") and readDataRTDB(path="Warning/Expectation"):
                                 writeDataRTDB(path="Warning/Expectation", data=False, success_notification=True)
 
                         # Stranger Detect
@@ -519,7 +519,7 @@ def main():
                                 writeDataRTDB(path="Lcd/stateExpectation", data="None", success_notification=True)
 
                             # Stranger Warning Off
-                            if readDataRTDB(path="Warning/Expectation"):
+                            if not readDataRTDB(path="Warning/Manual") and readDataRTDB(path="Warning/Expectation"):
                                 writeDataRTDB(path="Warning/Expectation", data=False, success_notification=True)
 
                         # ------------------------------------ ONLY for debugging ---------------------------------------
@@ -543,7 +543,7 @@ def main():
 
                 else:
                     # Stranger Warning Off
-                    if readDataRTDB(path="Warning/Expectation"):
+                    if not readDataRTDB(path="Warning/Manual") and readDataRTDB(path="Warning/Expectation"):
                         writeDataRTDB(path="Warning/Expectation", data=False, success_notification=True)
 
                     # Update LCD
@@ -557,7 +557,7 @@ def main():
             # Camera Off
             else:
                 # Stranger Warning Off
-                if readDataRTDB(path="Warning/Expectation"):
+                if not readDataRTDB(path="Warning/Manual") and readDataRTDB(path="Warning/Expectation"):
                     writeDataRTDB(path="Warning/Expectation", data=False, success_notification=True)
 
                 # Update LCD

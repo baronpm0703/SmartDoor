@@ -376,7 +376,8 @@ app.put('/home/personalInfo', async (req, res) => {
 app.post('/home/warn', async (req, res) => {
     const { warn } = req.body;
     const warnData = {
-        Expectation: warn
+        Expectation: warn,
+        Manual: warn
     }
     await database.ref('Warning').update(warnData);
     res.send('Warned successfully!');
